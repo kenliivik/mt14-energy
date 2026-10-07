@@ -1,5 +1,7 @@
 # MT14 heating switch
 
-Gas vs heat pump, from the household energy bills. Live at GitHub Pages.
+Did moving the heating from gas to a heat pump pay off? A dashboard built from the household energy bills.
 
-To add a month, append a row to `data.json`.
+Site: https://kenliivik.github.io/mt14-energy/
+
+The numbers live in `data/bills.json` (figures only, no bill PDFs). Add a month with the buttons on the page, or by adding a row to that file.

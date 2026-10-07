@@ -1,126 +1,1324 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MT14 Heating Switch</title>
-<meta name="description" content="Gas vs heat pump: what the energy bills say.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<!doctype html><html><head><meta charset=utf8><title>MT14 Heating Switch</title><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-:root{--bg:#f7f6f2;--card:#fff;--ink:#1d1d1b;--muted:#6b6a65;--line:#e4e2db;--elec:#2f6fd6;--gas:#e0792b;--good:#2c8a4b;}
-@media (prefers-color-scheme:dark){:root{--bg:#141413;--card:#1e1e1c;--ink:#efeee9;--muted:#a3a29c;--line:#33322f;--elec:#6c9cf0;--gas:#f0a060;--good:#5cc07d;}}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif}
-main{max-width:980px;margin:0 auto;padding:40px 16px 64px}
-h1{font-size:clamp(28px,5vw,40px);margin:0 0 6px;letter-spacing:-.02em}
-h2{font-size:20px;margin:0 0 4px}
-.sub{color:var(--muted);margin:0 0 32px}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:28px}
-.kpi,.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
-.kpi .v{font-size:30px;font-weight:700;letter-spacing:-.02em}
-.kpi .l{color:var(--muted);font-size:14px}
-.good{color:var(--good)}
-.card{margin-bottom:20px}
-.card p.note{color:var(--muted);font-size:14px;margin:0 0 14px}
-.chart{position:relative;height:320px}
-ul.find{padding-left:20px;margin:8px 0 0}ul.find li{margin:6px 0}
-table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
-th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-th:first-child,td:first-child{text-align:left}
-th{color:var(--muted);font-weight:500}
-.scroll{overflow-x:auto}
-footer{color:var(--muted);font-size:13px;margin-top:28px}
+/* Layout: one reading column. Answer first, then the evidence, then the forecast, then the fine print. */
+:root {
+  --plane: #f2f4f6;
+  --surface: #fcfcfb;
+  --ink: #0f1216;
+  --ink-2: #4c525b;
+  --ink-3: #7d838c;
+  --grid: #e3e5e9;
+  --axis: #c1c5cc;
+  --hair: rgba(15,18,22,0.10);
+  --elec: #2a78d6;
+  --gas: #eb6834;
+  --then: #b3b8c0;
+  --now: #262b33;
+  --good: #0ca30c;
+  --good-ink: #006300;
+  --good-wash: #e7f4e6;
+  --warn: #fab219;
+  --warn-ink: #6b4a00;
+  --warn-wash: #fdf1d3;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --plane: #0e1012; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c2c5cb; --ink-3: #8b9098;
+    --grid: #2b2d30; --axis: #3a3d42; --hair: rgba(255,255,255,0.10);
+    --elec: #3987e5; --gas: #d95926; --then: #5a5f68; --now: #e8eaee;
+    --good: #0ca30c; --good-ink: #4fc24f; --good-wash: #14301a;
+    --warn: #fab219; --warn-ink: #fbc95a; --warn-wash: #33290f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --plane: #0e1012; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c2c5cb; --ink-3: #8b9098;
+  --grid: #2b2d30; --axis: #3a3d42; --hair: rgba(255,255,255,0.10);
+  --elec: #3987e5; --gas: #d95926; --then: #5a5f68; --now: #e8eaee;
+  --good: #0ca30c; --good-ink: #4fc24f; --good-wash: #14301a;
+  --warn: #fab219; --warn-ink: #fbc95a; --warn-wash: #33290f;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; }
+body { background: var(--plane); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 980px; margin: 0 auto; padding-inline: 20px; padding-block: 36px 72px; display: flex; flex-direction: column; gap: 44px; }
+h1, h2, h3, p { margin: 0; }
+h1 { font-size: clamp(1.7rem, 4.4vw, 2.5rem); line-height: 1.12; font-weight: 600; letter-spacing: -0.015em; text-wrap: balance; max-width: 20ch; }
+h2 { font-size: 1.3rem; line-height: 1.25; font-weight: 600; letter-spacing: -0.005em; text-wrap: balance; }
+h3 { font-size: 1rem; font-weight: 600; }
+.eyebrow { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.lede { color: var(--ink-2); max-width: 62ch; }
+.note { color: var(--ink-2); font-size: 0.9rem; max-width: 68ch; }
+.small { font-size: 0.82rem; color: var(--ink-3); }
+section { display: flex; flex-direction: column; gap: 16px; }
+.head { display: flex; flex-direction: column; gap: 8px; }
+
+/* answer */
+.answer { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 28px; align-items: end; }
+.answer .q { display: flex; flex-direction: column; gap: 14px; }
+.verdict { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 500; padding: 3px 10px 3px 8px; border-radius: 999px; white-space: nowrap; }
+.chip i { font-style: normal; font-family: var(--mono); font-weight: 500; }
+.chip.good { background: var(--good-wash); color: var(--good-ink); }
+.chip.warn { background: var(--warn-wash); color: var(--warn-ink); }
+.hero { background: var(--surface); border: 1px solid var(--hair); border-radius: 10px; padding: 22px 24px; display: flex; flex-direction: column; gap: 4px; }
+.hero .fig { font-size: clamp(3rem, 9vw, 4.4rem); line-height: 1; font-weight: 600; letter-spacing: -0.03em; }
+.hero .lab { font-weight: 500; }
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--axis); }
+.tile { padding: 16px 20px 4px 0; display: flex; flex-direction: column; gap: 2px; }
+.tile + .tile { padding-left: 20px; border-left: 1px solid var(--grid); }
+.tile .lab { font-size: 0.85rem; color: var(--ink-2); }
+.tile .val { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
+.tile .val small { font-size: 0.95rem; font-weight: 500; color: var(--ink-2); letter-spacing: 0; }
+.tile .sub { font-size: 0.85rem; color: var(--ink-2); }
+
+/* cards and charts */
+.card { background: var(--surface); border: 1px solid var(--hair); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.cardtop { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px 16px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.85rem; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend b { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.chart { position: relative; width: 100%; min-width: 0; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { font-family: var(--sans); fill: var(--ink-3); font-size: 11px; font-variant-numeric: tabular-nums; }
+.chart text.v { fill: var(--ink); font-weight: 500; font-size: 11.5px; }
+.chart text.s { fill: var(--good-ink); font-weight: 500; }
+.chart text.m { fill: var(--ink-2); font-family: var(--mono); font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; }
+.chart .hit { fill: transparent; cursor: default; outline: none; }
+.chart .hit:hover, .chart .hit:focus-visible { fill: var(--hair); }
+.tip { position: absolute; pointer-events: none; z-index: 5; background: var(--surface); color: var(--ink); border: 1px solid var(--axis); border-radius: 8px; padding: 9px 11px; font-size: 0.82rem; line-height: 1.4; box-shadow: 0 6px 20px rgba(0,0,0,0.14); min-width: 150px; max-width: 230px; }
+.tip .t { color: var(--ink-2); font-size: 0.75rem; margin-bottom: 4px; }
+.tip .r { display: flex; align-items: center; gap: 8px; }
+.tip .r b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.tip .r span { color: var(--ink-2); }
+.tip .k { width: 12px; height: 3px; border-radius: 2px; flex: none; }
+.seg { display: inline-flex; border: 1px solid var(--axis); border-radius: 8px; padding: 2px; gap: 2px; }
+.seg button { font: inherit; font-size: 0.85rem; color: var(--ink-2); background: transparent; border: 0; border-radius: 6px; padding: 4px 12px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.seg button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid var(--elec); outline-offset: 2px; }
+
+/* why it works */
+.eq { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.eq .card { gap: 6px; }
+.eq .val { font-size: 1.9rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+.eq .val small { font-size: 0.95rem; font-weight: 500; color: var(--ink-2); letter-spacing: 0; }
+.eq .lab { font-size: 0.85rem; color: var(--ink-2); display: flex; align-items: center; gap: 7px; }
+.eq .lab b { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+.eq p { font-size: 0.88rem; color: var(--ink-2); }
+
+/* forecast */
+.fc { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 28px; }
+.ctrls { display: flex; flex-direction: column; gap: 18px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 0.88rem; font-weight: 500; }
+.field .hint { font-size: 0.8rem; color: var(--ink-3); }
+select, input[type="number"] { font: inherit; color: var(--ink); background: var(--plane); border: 1px solid var(--axis); border-radius: 8px; padding: 8px 10px; width: 100%; }
+input[type="range"] { width: 100%; accent-color: var(--elec); }
+.scale { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.out { display: flex; flex-direction: column; gap: 14px; }
+.bar { display: flex; flex-direction: column; gap: 5px; }
+.bar .lab { display: flex; justify-content: space-between; gap: 10px; font-size: 0.88rem; color: var(--ink-2); }
+.bar .lab b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.bar .track { height: 14px; }
+.bar .fill { height: 100%; border-radius: 0 4px 4px 0; min-width: 2px; transition: width .2s ease; }
+@media (prefers-reduced-motion: reduce) { .bar .fill { transition: none; } }
+.result { border-top: 1px solid var(--grid); padding-top: 14px; display: flex; flex-direction: column; gap: 6px; }
+.result .big { font-size: 1.35rem; font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; }
+.result p { font-size: 0.9rem; color: var(--ink-2); }
+
+/* where the money goes */
+.rows { display: flex; flex-direction: column; gap: 12px; }
+.row { display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 8.5rem; gap: 6px 14px; align-items: center; }
+.row .n { font-size: 0.92rem; }
+.row .n small { display: block; font-family: var(--mono); font-size: 0.7rem; color: var(--ink-3); letter-spacing: 0.02em; }
+.row .t { height: 14px; }
+.row .t i { display: block; height: 100%; background: var(--now); border-radius: 0 4px 4px 0; }
+.row .a { text-align: right; font-variant-numeric: tabular-nums; font-size: 0.92rem; font-weight: 500; }
+.row .a small { display: block; white-space: nowrap; color: var(--ink-3); font-weight: 400; font-size: 0.78rem; }
+
+/* choices */
+.choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.choices .card { gap: 8px; }
+.choices p { font-size: 0.9rem; color: var(--ink-2); }
+.choices .card > div { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+
+/* fine print */
+.fine { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 32px; }
+.fine ul { margin: 6px 0 0; padding-left: 1.1em; color: var(--ink-2); font-size: 0.9rem; display: flex; flex-direction: column; gap: 6px; }
+details { border-top: 1px solid var(--axis); padding-top: 14px; }
+summary { cursor: pointer; font-weight: 500; }
+.tablewrap { overflow-x: auto; margin-top: 12px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.85rem; font-variant-numeric: tabular-nums; min-width: 560px; }
+th, td { text-align: right; padding: 6px 10px; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font-weight: 500; color: var(--ink-2); font-size: 0.78rem; }
+tr.sw td { border-top: 2px solid var(--ink-3); }
+
+@media (max-width: 760px) {
+  .answer, .fc, .choices, .fine, .eq { grid-template-columns: minmax(0, 1fr); }
+  .tiles { grid-template-columns: minmax(0, 1fr); }
+  .tile { padding: 14px 0 12px; }
+  .tile + .tile { padding-left: 0; border-left: 0; border-top: 1px solid var(--grid); }
+  .row { grid-template-columns: minmax(0, 1fr) 8.5rem; }
+  .row .t { grid-column: 1 / -1; grid-row: 2; }
+  .wrap { gap: 36px; padding-block: 24px 56px; padding-inline: 16px; }
+  .card { padding: 16px; }
+}
+
+/* toolbar, notices, add-a-bill dialog */
+.topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding-bottom: 14px; border-bottom: 1px solid var(--grid); margin-bottom: -12px; }
+.acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { font: inherit; font-size: 0.88rem; font-weight: 500; color: var(--ink); background: var(--surface); border: 1px solid var(--axis); border-radius: 8px; padding: 7px 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+.btn:hover { border-color: var(--ink-3); }
+.btn:focus-visible, textarea:focus-visible, a:focus-visible { outline: 2px solid var(--elec); outline-offset: 2px; }
+.btn b { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+.btn.primary { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.btn.primary:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn.ghost { background: transparent; }
+.notice { background: var(--warn-wash); color: var(--ink); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; font-size: 0.92rem; margin-bottom: -20px; }
+.notice.quiet { background: var(--surface); border: 1px solid var(--hair); }
+.notice .acts { align-items: center; }
+.notice p { max-width: 70ch; }
+.notice a { color: inherit; }
+.notice input { font: inherit; font-size: 0.88rem; color: var(--ink); background: var(--surface); border: 1px solid var(--axis); border-radius: 8px; padding: 7px 10px; min-width: 0; flex: 1 1 14rem; max-width: 26rem; }
+.notice textarea { width: 100%; }
+dialog { border: 1px solid var(--axis); border-radius: 12px; background: var(--surface); color: var(--ink); padding: 0; width: min(620px, calc(100vw - 24px)); max-height: calc(100vh - 24px); }
+dialog::backdrop { background: rgba(10, 12, 16, 0.55); }
+.dlg { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.dlg-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.dlg-head .x { font: inherit; font-size: 1.3rem; line-height: 1; background: transparent; border: 0; color: var(--ink-2); cursor: pointer; padding: 4px 8px; border-radius: 6px; }
+.steps { margin: 0; padding-left: 1.2em; color: var(--ink-2); font-size: 0.9rem; display: flex; flex-direction: column; gap: 3px; }
+kbd { font-family: var(--mono); font-size: 0.8em; border: 1px solid var(--axis); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; background: var(--plane); color: var(--ink); }
+textarea { font-family: var(--mono); font-size: 0.78rem; line-height: 1.4; color: var(--ink); background: var(--plane); border: 1px solid var(--axis); border-radius: 8px; padding: 10px; width: 100%; resize: vertical; }
+.dlg-sum { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid var(--grid); padding-top: 14px; }
+.dlg-sum strong { font-size: 1.05rem; }
+.fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: 10px 12px; }
+.fields label { display: flex; flex-direction: column; gap: 4px; font-size: 0.78rem; color: var(--ink-2); min-width: 0; }
+.fields input { font: inherit; font-size: 0.92rem; font-variant-numeric: tabular-nums; color: var(--ink); background: var(--plane); border: 1px solid var(--axis); border-radius: 7px; padding: 6px 8px; width: 100%; min-width: 0; }
+.fields input.bad { border-color: var(--gas); }
+#dlg-more { border-top: 0; padding-top: 0; font-size: 0.88rem; }
+#dlg-more .fields { margin-top: 10px; }
+.dlg-foot { display: flex; justify-content: flex-end; gap: 8px; }
+.msgs { display: flex; flex-direction: column; gap: 4px; font-size: 0.86rem; color: var(--ink-2); }
+
 </style>
-</head>
-<body>
-<main>
-  <h1>MT14 heating switch</h1>
-  <p class="sub">Gas vs air-to-water heat pump, from the electricity and gas bills since March 2025. <span id="updated"></span></p>
+<div class="wrap">
 
-  <section class="kpis">
-    <div class="kpi"><div class="v good">≈ 139 €</div><div class="l">saved in the first six months on the heat pump (Apr to Sep 2026, vs staying on gas)</div></div>
-    <div class="kpi"><div class="v" id="k12">–</div><div class="l" id="k12l">spent in the last 12 months</div></div>
-    <div class="kpi"><div class="v">3.3×</div><div class="l">kWh of gas replaced per extra kWh of electricity</div></div>
-    <div class="kpi"><div class="v">≈ 640 €</div><div class="l">heat pump estimate for Oct to Mar, vs about 1,100 € on gas</div></div>
+  <div class="topbar">
+    <span class="small">Bills through <span data-t="through"></span></span>
+    <div class="acts">
+      <button type="button" class="btn" id="add-elec"><b style="background:var(--elec)"></b>Add electricity bill</button>
+      <button type="button" class="btn" id="add-gas"><b style="background:var(--gas)"></b>Add gas bill</button>
+    </div>
+  </div>
+
+  <div class="notice" id="local" hidden></div>
+  <div class="notice quiet" id="waiting" hidden></div>
+
+  <header class="answer">
+    <div class="q">
+      <span class="eyebrow">MT14 · gas and electricity bills · <span data-t="range"></span></span>
+      <h1>Did moving the heating from gas to electricity pay off?</h1>
+      <div class="verdict" id="chips"></div>
+      <p class="lede" id="lede"></p>
+    </div>
+    <div class="hero">
+      <span class="eyebrow">Saved so far</span>
+      <span class="fig" id="h-saved"></span>
+      <span class="lab" data-t="periodLong"></span>
+      <span class="small">Against the same <span data-t="nWord"></span> <span data-t="months"></span> heated with gas, at today's prices.</span>
+    </div>
+  </header>
+
+  <div class="tiles">
+    <div class="tile"><span class="lab">Paid for gas and electricity, <span data-t="periodShort"></span></span><span class="val" id="t-act"></span><span class="sub" id="t-act-sub"></span></div>
+    <div class="tile"><span class="lab">Energy bought in those months</span><span class="val" id="t-kwh"></span><span class="sub" id="t-kwh-sub"></span></div>
+    <div class="tile"><span class="lab">Gas replaced by each extra kWh of electricity</span><span class="val" id="t-ratio"></span><span class="sub">A plain electric heater manages about 1. A heat pump moves heat instead of making it, so it does several times that.</span></div>
+  </div>
+
+  <section>
+    <div class="head">
+      <h2>The fair comparison: same months, same prices</h2>
+      <p class="note">Prices keep changing, so comparing this year's bills with last year's would mix up the switch with the price rises. The grey bars take what you used in the same month when gas did the heating and price it at the rates on the newer bill. The dark bars are what you really paid.</p>
+    </div>
+    <div class="card">
+      <div class="cardtop">
+        <h3>Monthly cost, gas plus electricity, € incl. VAT</h3>
+        <div class="legend"><span><b style="background:var(--then)"></b>If gas still did the heating</span><span><b style="background:var(--now)"></b>What you paid</span></div>
+      </div>
+      <div class="chart" id="c-cmp"></div>
+      <p class="small" id="switch-note"></p>
+    </div>
   </section>
 
-  <section class="card">
-    <h2>Monthly cost</h2>
-    <p class="note">Euros incl. VAT. Heating moved off gas at the start of April 2026.</p>
-    <div class="chart"><canvas id="cost"></canvas></div>
+  <section>
+    <div class="head">
+      <h2>Month by month</h2>
+      <p class="note">Switch between euros and kWh. In euros the bills look only a little lower. In kWh the change is obvious: the house now buys far less energy for the same job.</p>
+    </div>
+    <div class="card">
+      <div class="cardtop">
+        <div class="legend"><span><b style="background:var(--elec)"></b>Electricity</span><span><b style="background:var(--gas)"></b>Gas</span></div>
+        <div class="seg" role="group" aria-label="Unit"><button type="button" id="u-eur" aria-pressed="true">Euros</button><button type="button" id="u-kwh" aria-pressed="false">kWh</button></div>
+      </div>
+      <div class="chart" id="c-month"></div>
+    </div>
   </section>
 
-  <section class="card">
-    <h2>Monthly energy</h2>
-    <p class="note">Electricity (day + night) and gas, both in kWh. Gas for May 2026 is estimated from meter readings.</p>
-    <div class="chart"><canvas id="energy"></canvas></div>
+  <section>
+    <div class="head">
+      <h2>Why it works even though electricity costs more</h2>
+      <p class="note" id="why-note"></p>
+    </div>
+    <div class="eq">
+      <div class="card"><span class="lab"><b style="background:var(--gas)"></b>1 kWh of gas</span><span class="val" id="q-gas"></span><p>All-in price, <span data-t="periodLong"></span>.</p></div>
+      <div class="card"><span class="lab"><b style="background:var(--elec)"></b>1 kWh of electricity</span><span class="val" id="q-elec"></span><p>Per-kWh price without the fixed monthly fees, same months.</p></div>
+      <div class="card"><span class="lab"><b style="background:var(--elec)"></b>Electricity to replace 1 kWh of gas</span><span class="val" id="q-eff"></span><p id="q-eff-p"></p></div>
+    </div>
   </section>
 
-  <section class="card">
-    <h2>Same months, a year apart</h2>
-    <p class="note">April to September, gas + electricity, euros incl. VAT.</p>
-    <div class="chart"><canvas id="yoy"></canvas></div>
+  <section id="sec-forecast">
+    <div class="head">
+      <h2>What the rest of the winter could look like</h2>
+      <p class="note">This part is an estimate. It covers the winter months the heat pump has not been billed for yet (<span data-t="winterLong"></span>). It takes the gas you burned in those months when the boiler did the heating and asks what the same warmth costs each way now. Two things decide the answer, and you can move both. The numbers also show when it would be worth falling back on the gas boiler.</p>
+    </div>
+    <div class="card">
+      <div class="fc">
+        <div class="ctrls">
+          <div class="field">
+            <label for="f-gas">Gas price to compare against</label>
+            <select id="f-gas"></select>
+            <span class="hint">All-in price per m³, including network fee, excise and VAT.</span>
+          </div>
+          <div class="field">
+            <label for="f-eff">kWh of gas replaced by 1 kWh of electricity: <strong id="f-eff-v"></strong></label>
+            <input type="range" id="f-eff" min="1" max="4" step="0.1" value="2.5">
+            <div class="scale"><span>1 plain heater</span><span>2.5</span><span>4</span></div>
+            <span class="hint" id="f-eff-h"></span>
+          </div>
+        </div>
+        <div class="out">
+          <div class="bar"><div class="lab"><span>Heating with gas, <span data-t="winterShort"></span></span><b id="o-gas"></b></div><div class="track"><div class="fill" id="b-gas" style="background:var(--gas)"></div></div></div>
+          <div class="bar"><div class="lab"><span>Heating with electricity, <span data-t="winterShort"></span></span><b id="o-elec"></b></div><div class="track"><div class="fill" id="b-elec" style="background:var(--elec)"></div></div></div>
+          <div class="result">
+            <span class="big" id="o-verdict"></span>
+            <p id="o-detail"></p>
+            <p id="o-payback"></p>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <section class="card">
-    <h2>Findings</h2>
-    <ul class="find">
-      <li>Gas fell from 102 m³ in March 2026 to 25 m³ in April and about 2.5 m³ a month since.</li>
-      <li>April to September 2026 cost <b>628 €</b>, against 689 € for the same months of 2025. Pricing 2025 usage at 2026 rates gives 767 € for staying on gas, so the switch saved about <b>139 €</b> (Apr 14, May 39, Jun 18, Jul 7, Aug 23, Sep 38). Not weather-corrected.</li>
-      <li>Electricity rose by 849 kWh over those months while 2,775 kWh of gas disappeared: a ratio of 3.3.</li>
-      <li>The last gas-heated winter (Oct 2025 to Mar 2026) used 784 m³ (8,391 kWh) and cost 728 € in gas.</li>
-      <li>The heat pump came with the home at no cost, so there is no payback period: every saving is pure gain.</li>
-      <li>Next winter at October 2026 prices (gas about 1.43 €/m³ all-in, electricity about 19.5 c/kWh): gas would cost about 1,100 €, the heat pump about 640 € if 1 kWh of electricity replaces 2.5 kWh of gas. The pump wins whenever that ratio stays above about 1.5.</li>
-      <li>Still to measure: a full winter on the heat pump.</li>
-    </ul>
+  <section>
+    <div class="head">
+      <h2>Where the money went</h2>
+      <p class="note" id="y-note"></p>
+    </div>
+    <div class="card"><div class="rows" id="rows"></div></div>
   </section>
 
-  <section class="card">
-    <h2>Bill data</h2>
-    <div class="scroll"><table id="tbl"><thead><tr><th>Month</th><th>Elec day kWh</th><th>Elec night kWh</th><th>Elec €</th><th>Gas m³</th><th>Gas kWh</th><th>Gas €</th><th>Total €</th></tr></thead><tbody></tbody></table></div>
-    <p class="note" style="margin-top:10px">Raw numbers: <a href="data.json">data.json</a>. Electricity bills start 9 March 2025; no gas bill for March 2025; May 2026 gas is estimated.</p>
+  <section>
+    <div class="head"><h2>Were the choices reasonable?</h2></div>
+    <div class="choices">
+      <div class="card"><div><h3>Switching the heating</h3><span class="chip" id="cc-1"></span></div><p id="ch-1"></p></div>
+      <div class="card"><div><h3>Keeping the gas connection</h3><span class="chip good"><i>✓</i> Costs almost nothing</span></div><p id="ch-2"></p></div>
+      <div class="card"><div><h3>Day and night tariff</h3><span class="chip good"><i>✓</i> Suits you</span></div><p id="ch-3"></p></div>
+      <div class="card"><div><h3>Electricity price</h3><span class="chip" id="cc-4"></span></div><p id="ch-4"></p></div>
+      <div class="card"><div><h3>Fixed monthly fees</h3><span class="chip warn"><i>!</i> Know the number</span></div><p id="ch-5"></p></div>
+      <div class="card"><div><h3>Gas price</h3><span class="chip" id="cc-6"></span></div><p id="ch-6"></p></div>
+    </div>
   </section>
 
-  <footer>Suppliers: Alexela (electricity), Elektrilevi (network), Energate (gas). VAT 22% until June 2025, 24% from July 2025.</footer>
-</main>
+  <section>
+    <div class="head"><h2>Gaps and fine print</h2></div>
+    <div class="fine">
+      <div>
+        <h3>Bills that are missing</h3>
+        <ul>
+          <li><strong>Gas, May 2026.</strong> The meter readings on the April and June bills show 2.6 m³ in between, so about €3. That month is filled in from the meter.</li>
+          <li><strong>Gas before April 2025.</strong> The meter already stood at 4,136 m³ then. Nothing from the 2024/25 winter is in the data.</li>
+          <li><strong>Electricity before 9 March 2025.</strong> The first bill starts mid-month, so March 2025 is left out of the charts.</li>
+          <li id="li-latest"></li>
+        </ul>
+      </div>
+      <div>
+        <h3>What the estimate assumes</h3>
+        <ul>
+          <li>Weather was not corrected for. A warmer or colder month than its twin a year earlier shifts the saving.</li>
+          <li>Everything electric other than heating is assumed to be used about as much as before the switch.</li>
+          <li>The heat pump was installed at no cost to you, so no payback period is counted. Servicing costs are not in the bills either.</li>
+          <li id="li-mild">An air-to-water heat pump loses efficiency as it gets colder outside, so the <span data-t="ratio"></span> measured in mild months will likely be lower in January.</li>
+        </ul>
+      </div>
+    </div>
+    <details>
+      <summary>All monthly figures</summary>
+      <div class="tablewrap"><table id="tbl"></table></div>
+    </details>
+  </section>
+</div>
+
+<dialog id="dlg" aria-labelledby="dlg-title">
+  <div class="dlg">
+    <div class="dlg-head"><h2 id="dlg-title">Add a bill</h2><button type="button" class="x" id="dlg-x" aria-label="Close">×</button></div>
+    <ol class="steps">
+      <li>Open the bill PDF.</li>
+      <li>Select everything (<kbd>Ctrl</kbd> + <kbd>A</kbd>) and copy it (<kbd>Ctrl</kbd> + <kbd>C</kbd>).</li>
+      <li>Click the box below and paste (<kbd>Ctrl</kbd> + <kbd>V</kbd>).</li>
+    </ol>
+    <textarea id="dlg-text" rows="5" placeholder="Paste the whole bill here" aria-label="Pasted bill text" spellcheck="false"></textarea>
+    <p class="small">Only the numbers shown below are kept. The pasted text, with its name, address and bank details, stays in this browser and is thrown away.</p>
+    <div id="dlg-result" hidden>
+      <div class="dlg-sum"><strong id="dlg-what"></strong><span class="chip" id="dlg-check"></span></div>
+      <div class="msgs" id="dlg-msgs"></div>
+      <div class="fields" id="dlg-fields"></div>
+      <details id="dlg-more"><summary>Every amount read from the bill</summary><div class="fields" id="dlg-parts"></div></details>
+    </div>
+    <div class="dlg-foot"><button type="button" class="btn ghost" id="dlg-cancel">Cancel</button><button type="button" class="btn primary" id="dlg-add" disabled>Add to dashboard</button></div>
+  </div>
+</dialog>
+
 <script>
-const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-const eur = v => v.toLocaleString('en-US',{maximumFractionDigits:0}) + ' €';
-const label = m => new Date(m + '-01').toLocaleDateString('en-GB',{month:'short',year:'2-digit'});
+/* Turns the raw bill rows (data/bills.json) into every number the page shows.
+   No DOM in here, so the same file runs in the browser and in tests. */
+(function (root) {
+  const NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+  const WINTER = [10, 11, 12, 1, 2, 3];
 
-fetch('data.json').then(r => r.json()).then(d => {
-  const M = d.months, L = M.map(x => label(x.month));
-  const elec = css('--elec'), gas = css('--gas'), ink = css('--muted'), line = css('--line');
-  Chart.defaults.color = ink; Chart.defaults.borderColor = line; Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
-  document.getElementById('updated').textContent = 'Updated ' + d.updated + '.';
+  const mo = k => +k.slice(5);
+  const yr = k => k.slice(0, 4);
+  const short = k => NAMES[mo(k) - 1];
+  const long = k => LONG[mo(k) - 1];
+  const longY = k => `${long(k)} ${yr(k)}`;
+  const shortY = k => `${short(k)} ${yr(k)}`;
+  const sum = (arr, f) => arr.reduce((a, x) => a + f(x), 0);
+  const r2 = v => Math.round(v * 100) / 100;
+  const addMonths = (k, n) => { const d = new Date(Date.UTC(+yr(k), mo(k) - 1 + n, 1)); return d.toISOString().slice(0, 7); };
 
-  const last12 = M.slice(-12);
-  const tot = last12.reduce((s,x) => s + x.elec_eur + (x.gas_eur||0), 0);
-  document.getElementById('k12').textContent = eur(tot);
-  document.getElementById('k12l').textContent = 'spent in the 12 months to ' + label(last12.at(-1).month) + ' (gas + electricity)';
+  const kwh = e => e.dayKwh + e.nightKwh;
+  const elecVar = e => e.energyDay + e.energyNight + e.balancing + e.netDay + e.netNight + e.renewable + e.security + e.excise;
+  const elecFixed = e => e.supplierFee + e.netFee;
+  const elecNet = e => elecVar(e) + elecFixed(e);
+  const gasNet = g => g.gas + g.network + g.excise + g.reserve;
+  // all-in net price of gas per m3
+  const gasRate = g => g.priceGas != null
+    ? g.priceGas + (g.priceNetwork || 0) + (g.priceExcise || 0) + (g.priceReserve || 0)
+    : gasNet(g) / g.m3;
+  const gasOther = g => g.priceGas != null ? gasRate(g) - g.priceGas : (g.network + g.excise + g.reserve) / g.m3;
+  const gasCommodity = g => g.priceGas != null ? g.priceGas : g.gas / g.m3;
 
-  const stacked = {responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-    scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true}},plugins:{legend:{position:'bottom'}}};
+  function span(keys, withYear) {
+    if (!keys.length) return { long: '', short: '', noYear: '' };
+    const a = keys[0], b = keys[keys.length - 1];
+    if (a === b) return { long: longY(a), short: shortY(a), noYear: long(a) };
+    if (yr(a) === yr(b)) return { long: `${long(a)} to ${long(b)} ${yr(b)}`, short: `${short(a)} to ${short(b)} ${yr(b)}`, noYear: `${long(a)} to ${long(b)}` };
+    return { long: `${longY(a)} to ${longY(b)}`, short: `${shortY(a)} to ${shortY(b)}`, noYear: `${longY(a)} to ${longY(b)}` };
+  }
 
-  new Chart(cost, {type:'bar', data:{labels:L, datasets:[
-    {label:'Electricity €', data:M.map(x=>x.elec_eur), backgroundColor:elec, borderRadius:3},
-    {label:'Gas €', data:M.map(x=>x.gas_eur), backgroundColor:gas, borderRadius:3}]}, options:stacked});
+  function compute(data) {
+    const sw = data.meta.switchMonth;
+    const elecAll = data.elec.filter(e => !e.partial).slice().sort((a, b) => a.month.localeCompare(b.month));
+    const gasAll = data.gas.slice().sort((a, b) => a.month.localeCompare(b.month));
+    const E = Object.fromEntries(elecAll.map(e => [e.month, e]));
+    const G = Object.fromEntries(gasAll.map(g => [g.month, g]));
+    const months = Object.keys(E).filter(k => G[k]).sort();
+    const first = months[0], last = months[months.length - 1];
+    const latestE = elecAll[elecAll.length - 1], latestG = gasAll[gasAll.length - 1];
+    const waiting = {
+      elecOnly: Object.keys(E).filter(k => !G[k] && k > first).sort(),
+      gasOnly: Object.keys(G).filter(k => !E[k] && k > first).sort()
+    };
 
-  new Chart(energy, {type:'bar', data:{labels:L, datasets:[
-    {label:'Electricity kWh', data:M.map(x=>+(x.elec_day_kwh+x.elec_night_kwh).toFixed(1)), backgroundColor:elec, borderRadius:3},
-    {label:'Gas kWh', data:M.map(x=>x.gas_kwh), backgroundColor:gas, borderRadius:3}]}, options:stacked});
+    const monthly = months.map(k => ({
+      key: k, label: short(k), year: yr(k),
+      dayKwh: E[k].dayKwh, nightKwh: E[k].nightKwh, elecKwh: kwh(E[k]), elecEur: E[k].total,
+      gasM3: G[k].m3, gasKwh: G[k].kwh, gasEur: G[k].total, est: !!G[k].estimated
+    }));
 
-  const mo = ['04','05','06','07','08','09'], get = (y,m) => M.find(x => x.month === y+'-'+m);
-  new Chart(yoy, {type:'bar', data:{labels:mo.map(m=>new Date('2026-'+m+'-01').toLocaleDateString('en-GB',{month:'short'})), datasets:[
-    {label:'2025 (gas heating)', data:mo.map(m=>{const r=get('2025',m);return r?+(r.elec_eur+r.gas_eur).toFixed(2):null}), backgroundColor:gas, borderRadius:3},
-    {label:'2026 (heat pump)', data:mo.map(m=>{const r=get('2026',m);return r?+(r.elec_eur+r.gas_eur).toFixed(2):null}), backgroundColor:elec, borderRadius:3}]},
-    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},scales:{x:{grid:{display:false}}},plugins:{legend:{position:'bottom'}}}});
+    // the gas-heated year: one twin for every month of the calendar
+    const base = {};
+    months.filter(k => k < sw).forEach(k => { base[mo(k)] = k; });
+    const hp = months.filter(k => k >= sw && base[mo(k)]);
 
-  const f = (v,dp=1) => v == null ? '–' : v.toFixed(dp);
-  document.querySelector('#tbl tbody').innerHTML = M.map(x => `<tr title="${x.note||''}"><td>${x.month}${x.note?' *':''}</td><td>${f(x.elec_day_kwh)}</td><td>${f(x.elec_night_kwh)}</td><td>${f(x.elec_eur,2)}</td><td>${f(x.gas_m3,3)}</td><td>${f(x.gas_kwh,1)}</td><td>${f(x.gas_eur,2)}</td><td>${(x.elec_eur+(x.gas_eur||0)).toFixed(2)}</td></tr>`).join('');
-});
+    const cmp = hp.map(k => {
+      const t = base[mo(k)], a = E[t], b = E[k], g0 = G[t], g1 = G[k];
+      const rd = (b.energyDay + b.netDay) / b.dayKwh, rn = (b.energyNight + b.netNight) / b.nightKwh;
+      const per = (b.balancing + b.renewable + b.security + b.excise) / kwh(b);
+      const ce = (a.dayKwh * rd + a.nightKwh * rn + kwh(a) * per + elecFixed(b)) * (1 + b.vat);
+      const cg = g0.m3 * gasRate(g1) * (1 + g1.vat);
+      return {
+        key: k, twin: t, label: short(k), year: yr(k), twinLabel: shortY(t),
+        cfElec: r2(ce), cfGas: r2(cg), cf: r2(ce + cg),
+        actElec: b.total, actGas: g1.total, act: r2(b.total + g1.total),
+        y25: r2(a.total + g0.total),
+        extraElec: kwh(b) - kwh(a), gasDisp: g0.kwh - g1.kwh,
+        kwhNow: kwh(b) + g1.kwh, kwhThen: kwh(a) + g0.kwh,
+        varNow: elecVar(b) * (1 + b.vat), elecKwh: kwh(b), twinGasKwh: g0.kwh
+      };
+    });
+    const S = f => sum(cmp, f);
+    const head = {
+      saved: r2(S(c => c.cf) - S(c => c.act)), cf: r2(S(c => c.cf)), act: r2(S(c => c.act)), y25: r2(S(c => c.y25)),
+      extraElec: S(c => c.extraElec), gasDisp: S(c => c.gasDisp),
+      ratio: S(c => c.extraElec) > 0 ? S(c => c.gasDisp) / S(c => c.extraElec) : null,
+      kwhNow: Math.round(S(c => c.kwhNow)), kwhThen: Math.round(S(c => c.kwhThen)),
+      months: cmp.length, allCheaper: cmp.every(c => c.cf > c.act)
+    };
+
+    // last 12 months, by what the money pays for
+    const ms = months.slice(-12);
+    const cats = { elec: 0, gas: 0, net: 0, fixed: 0, fees: 0, vat: 0 };
+    ms.forEach(k => {
+      const e = E[k], g = G[k];
+      cats.elec += e.energyDay + e.energyNight + e.balancing;
+      cats.fixed += elecFixed(e);
+      cats.net += e.netDay + e.netNight + g.network;
+      cats.fees += e.renewable + e.security + e.excise + g.excise + g.reserve;
+      cats.gas += g.gas;
+      cats.vat += e.total - elecNet(e) + g.total - gasNet(g);
+    });
+    const year = { total: r2(sum(ms, k => E[k].total + G[k].total)), elec: r2(sum(ms, k => E[k].total)), gas: r2(sum(ms, k => G[k].total)), cats, months: ms.length, range: span(ms).long };
+    const nightShare = sum(ms, k => E[k].nightKwh) / sum(ms, k => kwh(E[k]));
+
+    // winter months the heat pump has not been billed for yet
+    const measured = new Set(hp.map(mo));
+    const remaining = WINTER.filter(m => base[m] && !measured.has(m)).map(m => base[m]);
+    const quiet = months.filter(k => k > sw && mo(k) >= 5 && mo(k) <= 9);
+    const idle = quiet.length ? quiet : months.filter(k => k > sw);
+    const cookM3 = idle.length ? sum(idle, k => G[k].m3) / idle.length : 0;
+    const cookKwh = idle.length ? sum(idle, k => G[k].kwh) / idle.length : 0;
+    const cookEur = idle.length ? sum(idle, k => G[k].total) / idle.length : 0;
+    const vatE = latestE.vat, vatG = latestG.vat;
+    const contract = ((data.announced && data.announced.elec) || []).filter(c => c.from > latestE.month).sort((a, b) => a.from.localeCompare(b.from))[0] || null;
+    const eDay = contract ? contract.day / (1 + vatE) : latestE.energyDay / latestE.dayKwh;
+    const eNight = contract ? contract.night / (1 + vatE) : latestE.energyNight / latestE.nightKwh;
+    const perL = (latestE.balancing + latestE.renewable + latestE.security + latestE.excise) / kwh(latestE);
+    const dayPrice = (eDay + latestE.netDay / latestE.dayKwh + perL) * (1 + vatE);
+    const nightPrice = (eNight + latestE.netNight / latestE.nightKwh + perL) * (1 + vatE);
+    const gasWinter = WINTER.filter(m => base[m]).map(m => G[base[m]]);
+    const gasPrices = [];
+    if (gasWinter.length) gasPrices.push({ id: 'last', label: "Last gas winter's average", eurM3: sum(gasWinter, gasNet) / sum(gasWinter, g => g.m3) * (1 + vatG) });
+    gasPrices.push({ id: 'bill', label: `${longY(latestG.month)} bill`, eurM3: gasRate(latestG) * (1 + vatG) });
+    ((data.announced && data.announced.gas) || []).filter(a => a.month > latestG.month).sort((a, b) => a.month.localeCompare(b.month))
+      .forEach(a => gasPrices.push({ id: 'a' + a.month, label: `${longY(a.month)}, announced`, eurM3: a.price + gasOther(latestG) * (1 + vatG) }));
+    const remG = remaining.map(k => G[k]);
+    const winter = {
+      remaining, n: remaining.length,
+      gasM3: sum(remG, g => g.m3), gasKwh: sum(remG, g => g.kwh),
+      dispM3: Math.max(0, sum(remG, g => g.m3) - remaining.length * cookM3),
+      dispKwh: Math.max(0, sum(remG, g => g.kwh) - remaining.length * cookKwh),
+      kwhPerM3: remG.length ? sum(remG, g => g.kwh) / sum(remG, g => g.m3) : 10.7,
+      elecPrice: (1 - nightShare) * dayPrice + nightShare * nightPrice, dayPrice, nightPrice, nightShare,
+      elecPriceLabel: contract ? `the price from ${longY(contract.from)}` : `the ${longY(latestE.month)} price`,
+      gasPrices, gasDefault: gasPrices[gasPrices.length - 1].id,
+      short: remaining.length ? (remaining.length === 1 ? short(remaining[0]) : `${short(remaining[0])} to ${short(remaining[remaining.length - 1])}`) : '',
+      long: remaining.length ? (remaining.length === 1 ? long(remaining[0]) : `${long(remaining[0])} to ${long(remaining[remaining.length - 1])}`) : ''
+    };
+    const state = !cmp.length ? 'none' : remaining.length === 0 ? 'full' : hp.some(k => WINTER.includes(mo(k))) ? 'part' : 'mild';
+
+    const twinGasKwh = S(c => c.twinGasKwh);
+    const fixedOf = e => elecFixed(e) * (1 + e.vat);
+    const yearAgoE = E[addMonths(latestE.month, -12)] || null;
+    const unit = {
+      gasNow: twinGasKwh ? S(c => c.cfGas) / twinGasKwh * 100 : null,
+      elecNow: cmp.length ? S(c => c.varNow) / S(c => c.elecKwh) * 100 : null,
+      fixedMonth: fixedOf(latestE), fixedYearAgo: yearAgoE ? fixedOf(yearAgoE) : null,
+      summerShare: (() => { const s = months.filter(k => mo(k) >= 6 && mo(k) <= 8).slice(-3); return s.length ? sum(s, k => fixedOf(E[k])) / sum(s, k => E[k].total) : null; })()
+    };
+
+    const sPrice = (e, f) => e[f === 'day' ? 'energyDay' : 'energyNight'] / e[f === 'day' ? 'dayKwh' : 'nightKwh'] * (1 + e.vat) * 100;
+    const prices = {
+      elec: {
+        month: longY(latestE.month), day: sPrice(latestE, 'day'), night: sPrice(latestE, 'night'),
+        next: contract ? { from: longY(contract.from), day: contract.day * 100, night: contract.night * 100 } : null,
+        yearAgo: yearAgoE ? { month: longY(yearAgoE.month), day: sPrice(yearAgoE, 'day'), night: sPrice(yearAgoE, 'night') } : null
+      },
+      gas: {
+        month: longY(latestG.month), now: gasCommodity(latestG) * (1 + vatG),
+        lastWinter: gasWinter.length ? sum(gasWinter, g => g.gas * (1 + g.vat)) / sum(gasWinter, g => g.m3) : null,
+        announced: ((data.announced && data.announced.gas) || []).filter(a => a.month > latestG.month).sort((a, b) => a.month.localeCompare(b.month)).map(a => ({ month: long(a.month), price: a.price }))
+      }
+    };
+    const prev = addMonths(sw, -1);
+    const switchNote = G[sw] && G[prev] ? { month: longY(sw), prev: long(prev), m3: G[sw].m3, prevM3: G[prev].m3 } : null;
+
+    const p = span(hp);
+    const text = {
+      nWord: WORDS[cmp.length] || String(cmp.length), months: cmp.length === 1 ? 'month' : 'months',
+      periodLong: p.long, periodShort: p.short, periodNoYear: p.noYear,
+      range: `${shortY(first)} to ${shortY(last)}`, rangeLong: `${longY(first)} to ${longY(last)}`,
+      through: longY(last), yearRange: year.range,
+      winterShort: winter.short, winterLong: winter.long,
+      ratio: head.ratio != null ? head.ratio.toFixed(1) : '', cookM3: cookM3.toFixed(1), cookEur: Math.round(cookEur).toString(),
+      heating: data.meta.heating || 'heat pump'
+    };
+    return { monthly, cmp, head, year, winter, unit, prices, text, state, waiting, switchNote, latest: { elec: latestE.month, gas: latestG.month } };
+  }
+
+  root.MT14 = Object.assign(root.MT14 || {}, { compute, util: { NAMES, LONG, longY, shortY, addMonths, elecNet, gasNet } });
+})(typeof window !== 'undefined' ? window : globalThis);
 </script>
-</body>
-</html>
+<script>
+/* Reads the text of a pasted bill and pulls out the numbers the dashboard needs.
+   Everything runs in the browser. Names, addresses and bank details in the pasted
+   text are never read into the result. */
+(function (root) {
+  const N = '(\\d{1,3}(?:[ \\u00a0]\\d{3})+(?:[.,]\\d+)?|\\d+(?:[.,]\\d+)?)';
+  const num = s => s == null ? null : parseFloat(String(s).replace(/[  ]/g, '').replace(',', '.'));
+  const clean = t => String(t || '').replace(/[   ]/g, ' ').replace(/\s+/g, ' ').trim();
+  const ym = (y, m) => `${y}-${String(m).padStart(2, '0')}`;
+
+  function detect(text) {
+    const t = clean(text);
+    const e = /Elektri edastamine|Elektriaktsiis|Taastuvenergia tasu/i.test(t);
+    const g = /Maagaas|Varumakse|k.ttev..rtus/i.test(t);
+    if (e && !g) return 'elec';
+    if (g && !e) return 'gas';
+    return null;
+  }
+
+  // text that follows a label, up to the next row of the bill
+  function after(t, labelRe, stopRe, max) {
+    const m = labelRe.exec(t);
+    if (!m) return null;
+    let seg = t.slice(m.index + m[0].length, m.index + m[0].length + (max || 170));
+    const s = stopRe && stopRe.exec(seg);
+    if (s) seg = seg.slice(0, s.index);
+    return seg;
+  }
+
+  const E_STOP = /Fikseeritud|\(p.evaajal\)|\(\S{2}ajal\)|Kuutasu|Tarbimise tasakaalustamis|Elektri edastamine|Taastuvenergia tasu|Varustuskindluse tasu|Elektriaktsiis|Maksustatav|K.ibemaksuga|KOKKU|Anname|Lepingu/;
+
+  function elecRow(t, labelRe) {
+    const seg = after(t, labelRe, E_STOP);
+    if (seg == null) return null;
+    const qty = new RegExp(N + '\\s*kWh(?!\\s*\\/)').exec(seg.replace(/€\s*\/\s*kWh/g, '€/x'));
+    const amts = [...seg.matchAll(new RegExp(N + '\\s*€(?!\\s*\\/)', 'g'))];
+    return { qty: qty ? num(qty[1]) : null, amount: amts.length ? num(amts[amts.length - 1][1]) : null };
+  }
+
+  function parseElec(text) {
+    const t = clean(text), row = {}, missing = [];
+    const p = /Arveldusperiood\s*(\d{2})\.(\d{2})\.(\d{4})\s*-\s*(\d{2})\.(\d{2})\.(\d{4})/.exec(t)
+      || /Periood\s*(\d{2})\.(\d{2})\.(\d{4})\s*-\s*(\d{2})\.(\d{2})\.(\d{4})/.exec(t);
+    if (p) { row.month = ym(p[3], p[2]); if (p[1] !== '01') row.partial = true; } else missing.push('month');
+
+    const day = elecRow(t, /elekter[^()]{0,40}\(p.evaajal\)/i), night = elecRow(t, /elekter[^()]{0,40}\((?!p.ev)\S{2}ajal\)/i);
+    const nDay = elecRow(t, /Elektri edastamine[:,]?\s*p.ev/i), nNight = elecRow(t, /Elektri edastamine[:,]?\s*(?!p.ev)\S{2}(?=[\s(]|$)/i);
+    const fee = elecRow(t, /Kuutasu(?!\s*,)/), nFee = elecRow(t, /Kuutasu\s*,\s*kuni\s*\d+\s*A/);
+    const bal = elecRow(t, /Tarbimise tasakaalustamis\S*\s*kulu/i), ren = elecRow(t, /Taastuvenergia tasu/i);
+    const sec = elecRow(t, /Varustuskindluse tasu/i), exc = elecRow(t, /Elektriaktsiis/i);
+    const put = (key, v, required) => { if (v != null && !isNaN(v)) row[key] = v; else if (required) missing.push(key); else row[key] = 0; };
+    put('dayKwh', day && day.qty, true); put('nightKwh', night && night.qty, true);
+    put('energyDay', day && day.amount, true); put('energyNight', night && night.amount, true);
+    put('supplierFee', fee && fee.amount, false); put('balancing', bal && bal.amount, false);
+    put('netDay', nDay && nDay.amount, true); put('netNight', nNight && nNight.amount, true);
+    put('netFee', nFee && nFee.amount, true);
+    put('renewable', ren && ren.amount, false); put('security', sec && sec.amount, false); put('excise', exc && exc.amount, false);
+
+    const tot = new RegExp('KOKKU EUR\\s*' + N).exec(t) || new RegExp('KOKKU:\\s*' + N).exec(t);
+    put('total', tot && num(tot[1]), true);
+    const vat = /K.ibemaks\s*\(?(\d{1,2})\s*%/.exec(t);
+    row.vat = vat ? +vat[1] / 100 : 0.24;
+
+    const announced = [];
+    const a = new RegExp('kehtib alates (\\d{2})\\.(\\d{2})\\.(\\d{4}) kuni (\\d{2})\\.(\\d{2})\\.(\\d{4})\\. Uueks fikseeritud hinnaks on päeval ' + N + ' s\\/kWh ja öösel ' + N + ' s\\/kWh').exec(t);
+    if (a) announced.push({ from: ym(a[3], a[2]), to: ym(a[6], a[5]), day: num(a[7]) / 100, night: num(a[8]) / 100 });
+    return finish('elec', row, missing, announced);
+  }
+
+  function gasLine(t, labelRe) {
+    const m = new RegExp(labelRe.source + '\\s+' + N + '\\s+' + N + '\\s+' + N, 'i').exec(t);
+    return m ? { qty: num(m[1]), price: num(m[2]), amount: num(m[3]) } : null;
+  }
+
+  function parseGas(text) {
+    const t = clean(text), row = {}, missing = [];
+    const p = /Periood:?\s*(\d{2})\.(\d{2})\.(\d{4})\s*-\s*(\d{2})\.(\d{2})\.(\d{4})/.exec(t);
+    if (p) row.month = ym(p[3], p[2]); else missing.push('month');
+    const gas = gasLine(t, /Maagaas(?: kodutarbija)?/), net = gasLine(t, /V.rguteenus(?: kodutarbija)?/);
+    const exc = gasLine(t, /Aktsiis/), res = gasLine(t, /Varumakse/);
+    const put = (key, v, required) => { if (v != null && !isNaN(v)) row[key] = v; else if (required) missing.push(key); else row[key] = 0; };
+
+    // the meter table gives three decimals; the price table rounds to two
+    const meter = after(t, /Tarbimine \(m3\)/i, /Arvestusperioodil/, 200);
+    const reads = meter ? [...meter.matchAll(/\d{1,3}(?: \d{3})*[.,]\d{3}(?!\d)/g)].map(m => num(m[0])) : [];
+    let m3 = gas ? gas.qty : null;
+    if (reads.length >= 3 && Math.abs(reads[1] - reads[0] - reads[2]) < 0.002) m3 = reads[2];
+    else if (reads.length >= 2 && gas && Math.abs(reads[1] - reads[0] - gas.qty) < 0.01) m3 = Math.round((reads[1] - reads[0]) * 1000) / 1000;
+    put('m3', m3, true);
+    const k = new RegExp('tarbitud energiakogus:?\\s*' + N + '\\s*kWh', 'i').exec(t);
+    put('kwh', k && num(k[1]), true);
+    put('gas', gas && gas.amount, true); put('network', net && net.amount, true);
+    put('excise', exc && exc.amount, false); put('reserve', res && res.amount, false);
+    if (gas) row.priceGas = gas.price; if (net) row.priceNetwork = net.price;
+    if (exc) row.priceExcise = exc.price; if (res) row.priceReserve = res.price;
+    const tot = new RegExp('Tasuda EUR:?\\s*' + N).exec(t) || new RegExp('Summa käibemaksuga:?\\s*' + N).exec(t);
+    put('total', tot && num(tot[1]), true);
+    const vat = /K.ibemaks\s*(\d{1,2})\s*%/.exec(t);
+    row.vat = vat ? +vat[1] / 100 : 0.24;
+
+    const announced = [];
+    for (const m of t.matchAll(new RegExp('Alates (?:\\d{2}\\.)?(\\d{2})\\.(\\d{4}) on kodutarbija muutuv maagaasi hind käibemaksuga ' + N + ' ?€', 'g')))
+      announced.push({ month: ym(m[2], m[1]), price: num(m[3]) });
+    return finish('gas', row, missing, announced);
+  }
+
+  // do the parts add up to the total printed on the bill?
+  function check(type, row) {
+    const parts = type === 'elec'
+      ? ['energyDay', 'energyNight', 'supplierFee', 'balancing', 'netDay', 'netNight', 'netFee', 'renewable', 'security', 'excise']
+      : ['gas', 'network', 'excise', 'reserve'];
+    if (parts.some(k => row[k] == null || isNaN(row[k])) || row.total == null || isNaN(row.total)) return { ok: false, sum: null };
+    const s = parts.reduce((a, k) => a + row[k], 0) * (1 + (row.vat || 0));
+    return { ok: Math.abs(s - row.total) <= (type === 'elec' ? 0.08 : 0.04), sum: Math.round(s * 100) / 100 };
+  }
+
+
+  /* ---- order-independent reading -------------------------------------------
+     Some PDF viewers copy a table column by column, so labels and numbers are
+     not next to each other. Bills repeat themselves (quantity x price = amount,
+     parts + VAT = total), which is enough to put the numbers back in place. */
+  function tokens(text) {
+    const s = String(text || '').replace(/[   ]/g, ' ').replace(/\d{2}\.\d{2}\.\d{4}/g, ' § ');
+    const out = [];
+    const push = (raw, i) => { const d = /[.,](\d+)$/.exec(raw); out.push({ v: num(raw), dec: d ? d[1].length : 0, i }); };
+    for (const m of s.matchAll(/(?<![\d.,])(?:\d{1,3}(?: \d{3})+(?:[.,]\d+)?|\d+(?:[.,]\d+)?)(?![\d])/g)) {
+      push(m[0], m.index);
+      if (m[0].includes(' ')) m[0].split(' ').forEach((part, j) => push(part, m.index + j));   // "1 397,817" may be two cells
+    }
+    return out;
+  }
+  const order = (t, defs) => defs.map(([key, re]) => { const m = re.exec(t); return m ? { key, i: m.index } : null; }).filter(Boolean).sort((a, b) => a.i - b.i).map(x => x.key);
+  const nearest = (list, target, tol) => { let best = null; for (const v of list) if (Math.abs(v - target) <= tol && (best == null || Math.abs(v - target) < Math.abs(best - target))) best = v; return best; };
+
+  function parseElecLoose(text) {
+    const t = clean(text), row = {}, missing = [];
+    const p = /Arveldusperiood\s*(\d{2})\.(\d{2})\.(\d{4})\s*-\s*(\d{2})\.(\d{2})\.(\d{4})/.exec(t);
+    if (p) { row.month = ym(p[3], p[2]); if (p[1] !== '01') row.partial = true; } else missing.push('month');
+    const vat = /K.ibemaks\s*\(?(\d{1,2})\s*%/.exec(t); row.vat = vat ? +vat[1] / 100 : 0.24;
+    const all = (re) => [...t.matchAll(re)].map(m => num(m[1]));
+    const prices = all(new RegExp(N + '\\s*€\\s*\\/\\s*kWh', 'g')), perPiece = all(new RegExp(N + '\\s*€\\s*\\/\\s*tk', 'g'));
+    const euros = all(new RegExp(N + '\\s*€(?!\\s*\\/)', 'g'));
+    const pool = tokens(text).map(x => x.v);
+    const roles = order(t, [['energyDay', /\(p.evaajal\)/i], ['energyNight', /\((?!p.ev)\S{2}ajal\)/i], ['balancing', /tasakaalustamis/i],
+      ['netDay', /edastamine[:,]?\s*p.ev/i], ['netNight', /edastamine[:,]?\s*(?!p.ev)\S{2}(?=[\s(]|$)/i],
+      ['renewable', /Taastuvenergia tasu/i], ['security', /Varustuskindluse tasu/i], ['excise', /Elektriaktsiis/i]]);
+    const rate = {};
+    if (roles.length && roles.length === prices.length) roles.forEach((r, i) => { rate[r] = prices[i]; });
+    const tm = new RegExp('Tarbimine:?\\s*' + N + '\\s*kWh').exec(t);
+    let T = tm ? num(tm[1]) : null, best = null;
+    // day + night = total, and each must explain two amounts on the bill
+    const uniq = [...new Set(pool)].filter(v => v > 0);
+    const fits = (d, n) => ['energyDay', 'netDay'].every(r => rate[r] != null && nearest(euros, d * rate[r], 0.0061) != null)
+      && ['energyNight', 'netNight'].every(r => rate[r] != null && nearest(euros, n * rate[r], 0.0061) != null);
+    for (const d of uniq) for (const n of uniq) {
+      if (best) break;
+      if (T != null ? Math.abs(d + n - T) > 0.0015 : !uniq.some(x => Math.abs(d + n - x) <= 0.0015 && x > d && x > n)) continue;
+      if (fits(d, n)) best = [d, n];
+    }
+    if (best) { row.dayKwh = best[0]; row.nightKwh = best[1]; if (T == null) T = best[0] + best[1]; } else missing.push('dayKwh', 'nightKwh');
+    const qty = { energyDay: row.dayKwh, netDay: row.dayKwh, energyNight: row.nightKwh, netNight: row.nightKwh };
+    ['energyDay', 'energyNight', 'netDay', 'netNight', 'balancing', 'renewable', 'security', 'excise'].forEach(r => {
+      const required = /Day|Night/.test(r), q = required ? qty[r] : T;
+      const a = rate[r] != null && q != null ? nearest(euros, q * rate[r], 0.0061) : null;
+      if (a != null) row[r] = a; else if (required || rate[r] != null) missing.push(r); else row[r] = 0;
+    });
+    const fees = order(t, [['supplierFee', /Kuutasu(?!\s*,)/], ['netFee', /Kuutasu\s*,\s*kuni/]]);
+    row.supplierFee = 0;
+    if (fees.length === perPiece.length) fees.forEach((r, i) => { row[r] = perPiece[i]; });
+    if (row.netFee == null) missing.push('netFee');
+    const tot = new RegExp('KOKKU EUR\\s*' + N).exec(t);
+    if (tot) row.total = num(tot[1]);
+    else {
+      const c = check('elec', Object.assign({ total: 0 }, row));
+      const guess = c.sum != null ? nearest(euros, c.sum, 0.08) : null;
+      if (guess != null) row.total = guess; else missing.push('total');
+    }
+    const announced = [];
+    const a = new RegExp('kehtib alates (\\d{2})\\.(\\d{2})\\.(\\d{4}) kuni (\\d{2})\\.(\\d{2})\\.(\\d{4})\\. Uueks fikseeritud hinnaks on p.eval ' + N + ' s\\/kWh ja ..sel ' + N + ' s\\/kWh').exec(t);
+    if (a) announced.push({ from: ym(a[3], a[2]), to: ym(a[6], a[5]), day: num(a[7]) / 100, night: num(a[8]) / 100 });
+    return finish('elec', row, [...new Set(missing)], announced);
+  }
+
+  function parseGasLoose(text) {
+    const t = clean(text), row = {}, missing = [];
+    const p = /Periood:?\s*(\d{2})\.(\d{2})\.(\d{4})\s*-\s*(\d{2})\.(\d{2})\.(\d{4})/.exec(t);
+    if (p) row.month = ym(p[3], p[2]); else missing.push('month');
+    const vat = /K.ibemaks\s*(\d{1,2})\s*%/.exec(t); row.vat = vat ? +vat[1] / 100 : 0.24;
+    const tk = tokens(text);
+    const unitPrice = new RegExp(N + '\\s*€\\s*\\/\\s*kWh').exec(t);
+    const prices = tk.filter(x => x.dec >= 4 && !(unitPrice && x.v === num(unitPrice[1]))).map(x => x.v).slice(0, 4);
+    const roles = order(t, [['network', /V.rguteenus(?= kodutarbija|\s)/], ['gas', /Maagaas(?= kodutarbija|\s)/], ['excise', /Aktsiis/], ['reserve', /Varumakse/]]);
+    const three = tk.filter(x => x.dec === 3).map(x => x.v), two = tk.filter(x => x.dec === 2).map(x => x.v);
+    let m3 = null;
+    for (const a of three) for (const b of three) { const c = nearest(three, b - a, 0.0015); if (m3 == null && b > a && c != null && c > 0) m3 = c; }
+    if (m3 == null && prices.length === 4) {       // no meter table: take the quantity that explains all four amounts
+      m3 = two.find(q => q > 0 && prices.every(pr => nearest(two, q * pr, 0.011) != null)) ?? null;
+    }
+    if (m3 != null) row.m3 = m3; else missing.push('m3');
+    if (roles.length === 4 && prices.length === 4 && m3 != null) {
+      roles.forEach((r, i) => {
+        const a = nearest(two, m3 * prices[i], 0.011);
+        if (a != null) { row[r] = a; row['price' + ({ gas: 'Gas', network: 'Network', excise: 'Excise', reserve: 'Reserve' })[r]] = prices[i]; }
+        else missing.push(r);
+      });
+    } else missing.push('gas', 'network');
+    if (m3 != null) {
+      const cvs = two.filter(v => v >= 9 && v <= 13);
+      let k = null;
+      for (const cv of cvs) { const c = nearest(two, m3 * cv, 0.0051 * m3 + 0.011); if (c != null && c !== cv) k = c; }
+      if (k != null) row.kwh = k; else missing.push('kwh');
+    } else missing.push('kwh');
+    const c = check('gas', Object.assign({ total: 0 }, row));
+    const tot = c.sum != null ? nearest(two, c.sum, 0.021) : null;
+    if (tot != null) row.total = tot; else missing.push('total');
+    const announced = [];
+    for (const m of t.matchAll(new RegExp('Alates (?:\\d{2}\\.)?(\\d{2})\\.(\\d{4}) on kodutarbija muutuv maagaasi hind k.ibemaksuga ' + N + ' ?€', 'g')))
+      announced.push({ month: ym(m[2], m[1]), price: num(m[3]) });
+    return finish('gas', row, [...new Set(missing)], announced);
+  }
+
+  function finish(type, row, missing, announced) {
+    return { type, row, missing, announced, check: check(type, row), ok: missing.length === 0 };
+  }
+
+  function parse(text, preferred) {
+    const type = detect(text) || preferred || null;
+    if (!type) return { type: null, row: {}, missing: ['type'], announced: [], check: { ok: false, sum: null }, ok: false };
+    const none = { type: null, row: {}, missing: ['type'], announced: [], check: { ok: false, sum: null }, ok: false };
+    const strict = type === 'elec' ? parseElec(text) : parseGas(text);
+    if (strict.ok && strict.check.ok) return strict;
+    const loose = type === 'elec' ? parseElecLoose(text) : parseGasLoose(text);
+    if (loose.ok && loose.check.ok) return loose;
+    if (!detect(text)) return none;          // nothing bill-like in the text at all
+    return loose.missing.length < strict.missing.length ? loose : strict;
+  }
+
+  root.MT14 = Object.assign(root.MT14 || {}, { parse, parseElec, parseGas, parseElecLoose, parseGasLoose, detect, check });
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>
+/* Page logic: load the bill data, draw everything, and handle "Add a bill". */
+(function () {
+  const { compute, parse, check, util } = window.MT14;
+  const $ = id => document.getElementById(id);
+  const eur = (v, d = 0) => (v < 0 ? '−' : '') + '€' + Math.abs(v).toLocaleString('en-GB', { minimumFractionDigits: d, maximumFractionDigits: d });
+  const num = (v, d = 0) => v.toLocaleString('en-GB', { minimumFractionDigits: d, maximumFractionDigits: d });
+  const NS = 'http://www.w3.org/2000/svg';
+  const LS_KEY = 'mt14.bills.local', LS_TOKEN = 'mt14.github.token';
+  let published = null, local = emptyLocal(), data = null, D = null, unit = 'eur';
+
+  /* ---------- small helpers ---------- */
+  function el(tag, attrs, parent, text) {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (text != null) n.textContent = text;
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+  function h(tag, props, ...kids) {
+    const n = document.createElement(tag);
+    if (props) for (const k in props) { if (k === 'class') n.className = props[k]; else if (k.startsWith('on')) n.addEventListener(k.slice(2), props[k]); else if (k in n && k !== 'list') n[k] = props[k]; else n.setAttribute(k, props[k]); }
+    kids.flat().forEach(c => { if (c != null) n.append(c); });
+    return n;
+  }
+  const setVal = (id, value, unitText) => { const n = $(id); n.textContent = ''; n.append(value + (unitText ? ' ' : '')); if (unitText) n.append(h('small', null, unitText)); };
+  const setChip = (id, kind, label) => { const n = $(id); n.className = 'chip ' + kind; n.textContent = ''; n.append(h('i', null, kind === 'good' ? '✓' : '!'), ' ' + label); };
+  function niceMax(v) {
+    const p = Math.pow(10, Math.floor(Math.log10(v)));
+    for (const m of [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (m * p >= v) return m * p;
+    return 10 * p;
+  }
+  function tickStep(max) {
+    for (const n of [4, 5, 3, 6]) { const s = max / n; if (Number.isInteger(s) || Number.isInteger(s * 2)) return s; }
+    return max / 4;
+  }
+  function colPath(x, y, w, hh, r) {
+    r = Math.min(r, hh, w / 2);
+    return `M${x},${y + hh}V${y + r}Q${x},${y} ${x + r},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + hh}Z`;
+  }
+  function tipFor(host) {
+    let t = host.querySelector('.tip');
+    if (!t) { t = h('div', { class: 'tip', hidden: true }); host.appendChild(t); }
+    return t;
+  }
+  function showTip(host, x, title, rows) {
+    const t = tipFor(host);
+    t.textContent = '';
+    t.appendChild(h('div', { class: 't' }, title));
+    rows.forEach(r => {
+      const d = h('div', { class: 'r' });
+      if (r.color) { const k = h('i', { class: 'k' }); k.style.background = r.color; d.appendChild(k); }
+      d.append(h('b', null, r.value), h('span', null, r.name));
+      t.appendChild(d);
+    });
+    t.hidden = false;
+    const w = host.clientWidth, tw = t.offsetWidth;
+    let left = x + 14; if (left + tw > w) left = x - tw - 14; if (left < 0) left = 0;
+    t.style.left = left + 'px'; t.style.top = '8px';
+  }
+  const hideTip = host => { tipFor(host).hidden = true; };
+  function hover(hit, host, fn) {
+    hit.addEventListener('pointermove', fn); hit.addEventListener('focus', fn);
+    hit.addEventListener('pointerleave', () => hideTip(host)); hit.addEventListener('blur', () => hideTip(host));
+  }
+
+  /* ---------- charts ---------- */
+  function drawCmp() {
+    const host = $('c-cmp'); const W = host.clientWidth; if (!W || !D) return;
+    host.querySelectorAll('svg').forEach(s => s.remove());
+    const rows = D.cmp.slice(-12); if (!rows.length) return;
+    const H = W < 480 ? 250 : 290, m = { l: 40, r: 6, t: 22, b: 46 };
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H, role: 'img', 'aria-label': `Monthly cost ${D.text.periodLong}: estimated cost if gas still did the heating, next to what was actually paid` });
+    const max = niceMax(Math.max(...rows.map(c => Math.max(c.cf, c.act)))), step = tickStep(max);
+    const pw = W - m.l - m.r, ph = H - m.t - m.b, y = v => m.t + ph - v / max * ph;
+    for (let v = 0; v <= max + 1e-6; v += step) {
+      el('line', { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v), stroke: v === 0 ? 'var(--axis)' : 'var(--grid)', 'stroke-width': 1 }, svg);
+      el('text', { x: m.l - 8, y: y(v) + 4, 'text-anchor': 'end' }, svg, '€' + v);
+    }
+    const band = pw / rows.length, bw = Math.max(4, Math.min(24, (band - 14) / 2)), gap = 2;
+    const caps = band >= 70, saves = band >= 44, every = band < 26 ? 2 : 1;
+    const years = new Set(rows.map(r => r.year)).size > 1;
+    rows.forEach((c, i) => {
+      const cx = m.l + band * i + band / 2, x1 = cx - bw - gap / 2, x2 = cx + gap / 2, d = c.cf - c.act;
+      el('path', { d: colPath(x1, y(c.cf), bw, y(0) - y(c.cf), 4), fill: 'var(--then)' }, svg);
+      el('path', { d: colPath(x2, y(c.act), bw, y(0) - y(c.act), 4), fill: 'var(--now)' }, svg);
+      if (caps) {
+        el('text', { x: x1 + bw / 2, y: y(c.cf) - 6, 'text-anchor': 'middle', class: 'v' }, svg, Math.round(c.cf));
+        el('text', { x: x2 + bw / 2, y: y(c.act) - 6, 'text-anchor': 'middle', class: 'v' }, svg, Math.round(c.act));
+      }
+      if (i % every === 0) el('text', { x: cx, y: H - m.b + 18, 'text-anchor': 'middle' }, svg, c.label + (years && (i === 0 || c.label === 'Jan') && band >= 44 ? ' ’' + c.year.slice(2) : ''));
+      if (saves) el('text', { x: cx, y: H - m.b + 34, 'text-anchor': 'middle', class: d >= 0 ? 's' : 'v' }, svg, d >= 0 ? (caps ? 'saved €' : '−€') + Math.round(d) : '+€' + Math.round(-d));
+      const hit = el('rect', { x: m.l + band * i, y: m.t, width: band, height: ph, class: 'hit', tabindex: 0, 'aria-label': `${c.label} ${c.year}: about ${eur(c.cf)} if gas still did the heating, ${eur(c.act)} actually paid` }, svg);
+      hover(hit, host, () => showTip(host, cx, `${c.label} ${c.year}`, [
+        { color: 'var(--then)', value: eur(c.cf), name: 'on gas (est.)' },
+        { color: 'var(--now)', value: eur(c.act), name: 'paid' },
+        { value: eur(Math.abs(d)), name: d >= 0 ? 'saved' : 'extra' },
+        { value: eur(c.y25), name: 'paid in ' + c.twinLabel }]));
+    });
+    host.appendChild(svg);
+  }
+
+  function drawMonth() {
+    const host = $('c-month'); const W = host.clientWidth; if (!W || !D) return;
+    host.querySelectorAll('svg').forEach(s => s.remove());
+    const H = W < 480 ? 270 : 320, m = { l: unit === 'eur' ? 40 : 46, r: 6, t: 30, b: 42 };
+    const rows = D.monthly.slice(-24), e = r => unit === 'eur' ? r.elecEur : r.elecKwh, g = r => unit === 'eur' ? r.gasEur : r.gasKwh;
+    const fmt = v => unit === 'eur' ? eur(v) : num(v) + ' kWh';
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H, role: 'img', 'aria-label': `Monthly electricity and gas, ${D.text.rangeLong}, stacked` });
+    const max = niceMax(Math.max(...rows.map(r => e(r) + g(r)))), step = tickStep(max);
+    const pw = W - m.l - m.r, ph = H - m.t - m.b, y = v => m.t + ph - v / max * ph;
+    for (let v = 0; v <= max + 1e-6; v += step) {
+      el('line', { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v), stroke: v === 0 ? 'var(--axis)' : 'var(--grid)', 'stroke-width': 1 }, svg);
+      el('text', { x: m.l - 8, y: y(v) + 4, 'text-anchor': 'end' }, svg, (unit === 'eur' ? '€' : '') + num(v));
+    }
+    const band = pw / rows.length, bw = Math.max(5, Math.min(24, band - 8)), every = band < 15 ? 3 : band < 30 ? 2 : 1;
+    const sw = rows.findIndex(r => r.key === data.meta.switchMonth);
+    if (sw > 0) {
+      const sx = m.l + band * sw, room = W - m.r - sx;
+      el('line', { x1: sx, x2: sx, y1: m.t - 18, y2: y(0), stroke: 'var(--ink-3)', 'stroke-width': 1 }, svg);
+      el('text', { x: sx - 7, y: m.t - 9, 'text-anchor': 'end', class: 'm' }, svg, 'gas heating');
+      el('text', { x: sx + 7, y: m.t - 9, class: 'm' }, svg, room < 125 ? 'electric' : 'electric heating');
+    }
+    rows.forEach((r, i) => {
+      const cx = m.l + band * i + band / 2, x = cx - bw / 2, ev = e(r), gv = g(r);
+      const eh = y(0) - y(ev), gh = y(0) - y(gv);
+      if (gh > 3) {
+        el('rect', { x, y: y(ev), width: bw, height: eh, fill: 'var(--elec)' }, svg);
+        el('path', { d: colPath(x, y(ev + gv), bw, Math.max(0, gh - 2), 4), fill: 'var(--gas)' }, svg);
+      } else {
+        el('path', { d: colPath(x, y(ev), bw, eh, 4), fill: 'var(--elec)' }, svg);
+        if (gh > 0.4) el('rect', { x, y: y(ev) - 2 - Math.max(1.5, gh), width: bw, height: Math.max(1.5, gh), fill: 'var(--gas)', rx: 1 }, svg);
+      }
+      if (i % every === 0) el('text', { x: cx, y: H - m.b + 17, 'text-anchor': 'middle' }, svg, r.label);
+      if (i === 0 || r.label === 'Jan') el('text', { x: cx - bw / 2, y: H - m.b + 34, class: 'm' }, svg, r.year);
+      const hit = el('rect', { x: m.l + band * i, y: m.t, width: band, height: ph, class: 'hit', tabindex: 0, 'aria-label': `${r.label} ${r.year}: electricity ${fmt(ev)}, gas ${fmt(gv)}` }, svg);
+      hover(hit, host, () => showTip(host, cx, r.label + ' ' + r.year, [
+        { color: 'var(--gas)', value: fmt(gv), name: 'gas' + (r.est ? ' (estimated)' : '') },
+        { color: 'var(--elec)', value: fmt(ev), name: 'electricity' },
+        { value: fmt(ev + gv), name: 'total' }]));
+    });
+    const pk = rows.reduce((a, r, i) => (e(r) + g(r) > e(rows[a]) + g(rows[a]) ? i : a), 0), pr = rows[pk];
+    el('text', { x: m.l + band * pk + band / 2, y: y(e(pr) + g(pr)) - 6, 'text-anchor': 'middle', class: 'v' }, svg, fmt(e(pr) + g(pr)));
+    host.appendChild(svg);
+  }
+  function setUnit(u) { unit = u; $('u-eur').setAttribute('aria-pressed', u === 'eur'); $('u-kwh').setAttribute('aria-pressed', u === 'kwh'); drawMonth(); }
+
+  /* ---------- forecast ---------- */
+  function forecast() {
+    const w = D.winter, hd = D.head; if (!w.n) return;
+    const sel = $('f-gas'), p = w.gasPrices.find(x => x.id === sel.value) || w.gasPrices[w.gasPrices.length - 1], r = parseFloat($('f-eff').value);
+    const gasCost = w.dispM3 * p.eurM3, kwh = w.dispKwh / r, elecCost = kwh * w.elecPrice, diff = gasCost - elecCost;
+    const be = w.elecPrice / (p.eurM3 / w.kwhPerM3);
+    $('f-eff-v').textContent = num(r, 1);
+    $('f-eff-h').textContent = (hd.ratio != null ? `Your bills show ${num(hd.ratio, 1)} so far${D.state === 'mild' ? ', in mild months' : ''}. ` : '') + `An air-to-water pump does less in hard frost. The pump beats gas above ${num(be, 1)} at this gas price.`;
+    $('o-gas').textContent = eur(gasCost); $('o-elec').textContent = eur(elecCost);
+    const mx = Math.max(gasCost, elecCost) || 1;
+    $('b-gas').style.width = (gasCost / mx * 100) + '%'; $('b-elec').style.width = (elecCost / mx * 100) + '%';
+    const round10 = v => Math.round(v / 10) * 10;
+    $('o-verdict').textContent = diff >= 0 ? `About ${eur(round10(diff))} cheaper on electricity` : `About ${eur(round10(-diff))} more expensive on electricity`;
+    $('o-detail').textContent = `Replacing ${num(w.dispM3)} m³ of gas takes about ${num(round10(kwh))} kWh of extra electricity at ${num(w.elecPrice * 100, 1)} cents per kWh. That is ${w.elecPriceLabel} with your usual day and night mix.`;
+    const total = diff + hd.saved, end = util.LONG[+w.remaining[w.remaining.length - 1].slice(5) - 1];
+    $('o-payback').textContent = total > 0
+      ? `Adding the ${eur(hd.saved)} already measured gives about ${eur(round10(total))} saved by the end of ${end}. The pump cost you nothing, so all of it is saving.`
+      : `At these settings the heat pump ends up costing more than the gas boiler by the end of ${end}.`;
+  }
+
+  /* ---------- everything else on the page ---------- */
+  function render() {
+    D = compute(data);
+    const hd = D.head, u = D.unit, w = D.winter, yr = D.year, T = D.text, P = D.prices;
+    document.querySelectorAll('[data-t]').forEach(n => { n.textContent = T[n.dataset.t] ?? ''; });
+
+    // answer
+    const chips = $('chips'); chips.textContent = '';
+    const chip = (kind, label) => h('span', { class: 'chip ' + kind }, h('i', null, kind === 'good' ? '✓' : '!'), ' ' + label);
+    chips.append(chip(hd.saved > 0 ? 'good' : 'warn', hd.saved > 0 ? 'Yes' : 'Not so far'));
+    chips.append(D.state === 'full' ? chip('good', 'Full year measured') : chip('warn', D.state === 'part' ? 'Winter partly measured' : 'Winter not measured yet'));
+    const lede = $('lede'); lede.textContent = '';
+    lede.append(`In the ${T.nWord} ${T.months} since the switch you paid about `, h('strong', null, eur(Math.abs(hd.saved))), hd.saved >= 0 ? ' less than gas heating would have cost. ' : ' more than gas heating would have cost. ');
+    lede.append(`The ${T.heating} came with the house, so there was nothing to earn back${hd.saved >= 0 ? ' and the saving is yours from the first month' : ''}. `);
+    const wm = D.cmp.filter(c => [10, 11, 12, 1, 2, 3].includes(+c.key.slice(5))).length;
+    lede.append(D.state === 'mild' ? 'Those were mild months, though. The cold half of the year is where most of the money is, and the pump has not done a winter yet.'
+      : D.state === 'part' ? `That includes ${wm} winter ${wm === 1 ? 'month' : 'months'} so far. The rest of the winter is still an estimate, further down.`
+      : 'That covers every month of the year, winter included.');
+    $('h-saved').textContent = eur(hd.saved);
+    $('t-act').textContent = eur(hd.act);
+    $('t-act-sub').textContent = `${eur(hd.y25)} in the same months when gas did the heating, at the prices of the time.`;
+    setVal('t-kwh', num(hd.kwhNow), 'kWh');
+    $('t-kwh-sub').textContent = hd.kwhThen > hd.kwhNow ? `Down ${Math.round((1 - hd.kwhNow / hd.kwhThen) * 100)}% from ${num(hd.kwhThen)} kWh on gas heating.` : `${num(hd.kwhThen)} kWh on gas heating.`;
+    setVal('t-ratio', hd.ratio != null ? num(hd.ratio, 1) : '–', 'kWh');
+
+    // comparison
+    const sn = D.switchNote;
+    $('switch-note').textContent = sn ? `${sn.month} looks like the changeover month: gas use fell to ${num(sn.m3)} m³ from ${num(sn.prevM3)} m³ in ${sn.prev}, and electricity jumped.` : '';
+
+    // why it works
+    if (u.gasNow != null && u.elecNow != null && hd.ratio) {
+      setVal('q-gas', num(u.gasNow, 1), 'cents'); setVal('q-elec', num(u.elecNow, 1), 'cents'); setVal('q-eff', num(u.elecNow / hd.ratio, 1), 'cents');
+      const cheaper = Math.round((1 - u.elecNow / hd.ratio / u.gasNow) * 100);
+      $('q-eff-p').textContent = `Because 1 kWh of electricity did the work of ${num(hd.ratio, 1)} kWh of gas. ` + (cheaper >= 0 ? `About ${cheaper}% cheaper than the gas it replaced.` : `About ${-cheaper}% dearer than the gas it replaced.`);
+      $('why-note').textContent = `A kWh of electricity costs you about ${num(u.elecNow / u.gasNow, 1)} times what a kWh of gas does. Electric heating only wins if it needs far fewer kWh for the same warmth.` + (cheaper >= 0 ? ' Yours does.' : '');
+    }
+
+    // forecast
+    $('sec-forecast').hidden = !w.n;
+    if (w.n) {
+      const sel = $('f-gas'), keep = sel.value;
+      sel.textContent = '';
+      w.gasPrices.forEach(p => sel.appendChild(h('option', { value: p.id }, `${p.label}: ${num(p.eurM3, 2)} €/m³`)));
+      sel.value = w.gasPrices.some(p => p.id === keep) ? keep : w.gasDefault;
+      forecast();
+    }
+
+    // where the money went
+    $('y-note').textContent = `${yr.range}: ${eur(yr.total)} in total, ${eur(yr.elec)} for electricity and ${eur(yr.gas)} for gas. ` +
+      ((yr.cats.elec + yr.cats.gas) / yr.total < 0.5 ? 'Less than half of that pays for the energy itself.' : '');
+    const cats = [
+      ['elec', 'Electricity itself', 'Elekter'], ['gas', 'Gas itself', 'Maagaas'], ['vat', 'VAT', 'Käibemaks'],
+      ['net', 'Delivery through the grid and gas pipes', 'Võrguteenus, per kWh and m³'],
+      ['fixed', 'Fixed monthly fees', 'Kuutasu, supplier and network'],
+      ['fees', 'Excise and state fees', 'Aktsiis, taastuvenergia tasu, varustuskindluse tasu, varumakse']
+    ].map(c => ({ n: c[1], et: c[2], v: yr.cats[c[0]] })).sort((a, b) => b.v - a.v);
+    const rows = $('rows'); rows.textContent = '';
+    cats.forEach(c => {
+      const bar = h('i'); bar.style.width = (c.v / cats[0].v * 100) + '%';
+      rows.appendChild(h('div', { class: 'row' },
+        h('div', { class: 'n' }, c.n, h('small', null, c.et)),
+        h('div', { class: 't' }, bar),
+        h('div', { class: 'a' }, eur(c.v), h('small', null, `€${Math.round(c.v / yr.total * 100)} of every €100`))));
+    });
+
+    // choices
+    const cheaperIn = D.cmp.filter(c => c.cf > c.act).length;
+    setChip('cc-1', hd.saved > 0 ? 'good' : 'warn', hd.saved > 0 ? 'Looks right' : 'Not yet');
+    $('ch-1').textContent = `${eur(Math.abs(hd.saved))} ${hd.saved >= 0 ? 'saved' : 'extra'} in the first ${T.nWord} ${T.months}` +
+      (hd.ratio != null ? `, and every extra kWh of electricity replaced about ${num(hd.ratio, 1)} kWh of gas. ` : '. ') +
+      'The heat pump was already installed and cost you nothing, so there is no investment to earn back. ' +
+      (hd.allCheaper ? 'It has been cheaper than gas in every month since the switch.' : `It was cheaper than gas in ${cheaperIn} of ${hd.months} months.`);
+    $('ch-2').textContent = `You still use about ${T.cookM3} m³ a month, around €${T.cookEur}. The gas bill has no fixed monthly fee, so an idle connection is free to keep as a backup.`;
+    $('ch-3').textContent = `About ${Math.round(w.nightShare * 100)}% of your electricity is used at the cheaper night rate. At ${w.elecPriceLabel} that is ${num(w.nightPrice * 100, 1)} cents per kWh all-in at night against ${num(w.dayPrice * 100, 1)} by day.`;
+    const pe = P.elec;
+    if (pe.next) {
+      const pct = Math.round((pe.next.day / pe.day - 1) * 100);
+      setChip('cc-4', pct > 5 ? 'warn' : 'good', pct > 5 ? 'Worth a look' : 'Steady');
+      $('ch-4').textContent = `Your fixed price goes from ${num(pe.day, 1)} to ${num(pe.next.day, 1)} s/kWh by day and from ${num(pe.night, 1)} to ${num(pe.next.night, 1)} at night in ${pe.next.from}, incl. VAT. ` +
+        (pct > 5 ? `That is about ${pct}% more, just as electricity carries the heating. ` : '') + 'The bill points to elektrihind.ee for comparing offers.';
+    } else {
+      const up = pe.yearAgo ? Math.round((pe.day / pe.yearAgo.day - 1) * 100) : 0;
+      setChip('cc-4', up > 10 ? 'warn' : 'good', up > 10 ? 'Worth a look' : 'Steady');
+      $('ch-4').textContent = `On the ${pe.month} bill you pay ${num(pe.day, 1)} s/kWh by day and ${num(pe.night, 1)} at night for the electricity itself, incl. VAT.` +
+        (pe.yearAgo ? ` A year earlier it was ${num(pe.yearAgo.day, 1)} and ${num(pe.yearAgo.night, 1)}${up > 10 ? `, so about ${up}% more now` : ''}.` : '') + ' The bill points to elektrihind.ee for comparing offers.';
+    }
+    $('ch-5').textContent = `About ${eur(u.fixedMonth, 2)} a month goes on electricity standing charges before you use anything. That is around ${eur(Math.round(u.fixedMonth * 12))} a year` +
+      (u.summerShare ? ` and about ${Math.round(u.summerShare * 100)}% of a summer bill` : '') + '.' +
+      (u.fixedYearAgo && u.fixedMonth - u.fixedYearAgo > 0.3 ? ` A year earlier it was ${eur(u.fixedYearAgo, 2)}.` : '');
+    const pg = P.gas, up = pg.lastWinter != null && pg.now > pg.lastWinter;
+    setChip('cc-6', up ? 'good' : 'warn', up ? 'Helps your case' : 'Keep an eye on it');
+    $('ch-6').textContent = (pg.lastWinter != null ? `In the last gas-heated winter you paid about ${num(pg.lastWinter, 2)} €/m³ for the gas itself, incl. VAT. ` : '') +
+      `The ${pg.month} bill shows ${num(pg.now, 2)}` + pg.announced.map(a => `, and ${num(a.price, 3).replace(/0$/, '')} is announced for ${a.month}`).join('') + '. ' +
+      (up ? 'The higher gas goes, the better the switch looks.' : 'If gas stays this cheap, the coldest weeks are where the boiler could win.');
+
+    // fine print
+    $('li-latest').textContent = '';
+    $('li-latest').append(h('strong', null, 'Latest bills in the data.'), ` Electricity: ${util.longY(D.latest.elec)}. Gas: ${util.longY(D.latest.gas)}.`);
+    $('li-mild').hidden = D.state !== 'mild';
+
+    // table
+    const t = $('tbl'); t.textContent = '';
+    const tr = t.insertRow(); ['Month', 'Electricity kWh', 'Electricity €', 'Gas m³', 'Gas kWh', 'Gas €', 'Total €'].forEach(x => tr.appendChild(h('th', null, x)));
+    D.monthly.forEach(r => {
+      const row = t.insertRow(); if (r.key === data.meta.switchMonth) row.className = 'sw';
+      [r.label + ' ' + r.year + (r.est ? ' *' : ''), num(r.elecKwh), num(r.elecEur, 2), num(r.gasM3, 1), num(r.gasKwh), num(r.gasEur, 2), num(r.elecEur + r.gasEur, 2)].forEach(v => { row.insertCell().textContent = v; });
+    });
+    const cap = t.createCaption(); cap.className = 'small'; cap.style.captionSide = 'bottom'; cap.style.textAlign = 'left'; cap.style.paddingTop = '8px';
+    cap.textContent = '* Gas for May 2026 is estimated from meter readings. The thicker line marks the switch. All euro amounts include VAT.';
+
+    renderNotices();
+    drawCmp(); drawMonth();
+  }
+
+  /* ---------- data: published file + bills added on this device ---------- */
+  function emptyLocal() { return { elec: [], gas: [], announced: { elec: [], gas: [] } }; }
+  function readLocal() {
+    try { const v = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); if (v && v.elec && v.gas) return Object.assign(emptyLocal(), v); } catch (e) { /* storage unavailable */ }
+    return emptyLocal();
+  }
+  function writeLocal() { try { localStorage.setItem(LS_KEY, JSON.stringify(local)); } catch (e) { /* storage unavailable */ } }
+  const strip = r => { const c = Object.assign({}, r); delete c.sent; return c; };
+  const same = (a, b) => { const x = strip(a), y = strip(b), ks = new Set([...Object.keys(x), ...Object.keys(y)]); return [...ks].every(k => typeof x[k] === 'number' && typeof y[k] === 'number' ? Math.abs(x[k] - y[k]) < 1e-9 : x[k] === y[k]); };
+  function mergeList(base, extra, key) {
+    const m = new Map(base.map(r => [r[key], r]));
+    extra.forEach(r => m.set(r[key], strip(r)));
+    return [...m.values()].sort((a, b) => String(a[key]).localeCompare(String(b[key])));
+  }
+  function merge(pub, loc) {
+    return {
+      meta: pub.meta,
+      announced: { elec: mergeList((pub.announced || {}).elec || [], loc.announced.elec, 'from'), gas: mergeList((pub.announced || {}).gas || [], loc.announced.gas, 'month') },
+      elec: mergeList(pub.elec, loc.elec, 'month'), gas: mergeList(pub.gas, loc.gas, 'month')
+    };
+  }
+  // drop local rows once the published file contains them
+  function prune() {
+    ['elec', 'gas'].forEach(t => { local[t] = local[t].filter(r => !published[t].some(p => p.month === r.month && same(p, r))); });
+    local.announced.elec = local.announced.elec.filter(r => !((published.announced || {}).elec || []).some(p => same(p, r)));
+    local.announced.gas = local.announced.gas.filter(r => !((published.announced || {}).gas || []).some(p => same(p, r)));
+    writeLocal();
+  }
+  function serialize(d) {
+    const out = ['{', '  "meta": ' + JSON.stringify(d.meta) + ',', '  "announced": {', '    "elec": ' + JSON.stringify(d.announced.elec) + ',', '    "gas": ' + JSON.stringify(d.announced.gas), '  },'];
+    ['elec', 'gas'].forEach(key => {
+      out.push(`  "${key}": [`);
+      d[key].forEach((r, i) => out.push('    ' + JSON.stringify(r) + (i < d[key].length - 1 ? ',' : '')));
+      out.push('  ]' + (key === 'elec' ? ',' : ''));
+    });
+    out.push('}');
+    return out.join('\n') + '\n';
+  }
+  const billName = (type, month) => `${type === 'elec' ? 'electricity' : 'gas'} ${util.longY(month)}`;
+  const pendingBills = () => [...local.elec.map(r => ['elec', r]), ...local.gas.map(r => ['gas', r])];
+
+  /* ---------- GitHub ---------- */
+  function repo() {
+    const m = (data && data.meta && data.meta.repo || '').split('/');
+    if (m.length === 2 && m[0] && m[1]) return { owner: m[0], name: m[1] };
+    const host = location.hostname;
+    if (!host.endsWith('.github.io')) return null;
+    const owner = host.split('.')[0], name = location.pathname.split('/').filter(Boolean)[0] || host;
+    return { owner, name };
+  }
+  const b64 = s => { const bytes = new TextEncoder().encode(s); let bin = ''; bytes.forEach(b => { bin += String.fromCharCode(b); }); return btoa(bin); };
+  const unb64 = s => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s/g, '')), c => c.charCodeAt(0)));
+  const getToken = () => { try { return localStorage.getItem(LS_TOKEN) || ''; } catch (e) { return ''; } };
+  async function publish(token) {
+    const r = repo(), api = `https://api.github.com/repos/${r.owner}/${r.name}/contents/data/bills.json`;
+    const headers = { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json' };
+    const cur = await fetch(api, { headers, cache: 'no-store' });
+    if (cur.status === 401) throw new Error('GitHub did not accept that token. Check it has not expired.');
+    if (cur.status === 403 || cur.status === 404) throw new Error(`The token cannot see ${r.owner}/${r.name}. It needs access to that repository with Contents set to read and write.`);
+    if (!cur.ok) throw new Error('GitHub answered with an error (' + cur.status + '). Try again in a minute.');
+    const file = await cur.json();
+    const fresh = JSON.parse(unb64(file.content)), merged = merge(fresh, local);
+    const names = pendingBills().filter(([, row]) => !row.sent).map(([t, row]) => billName(t, row.month));
+    const put = await fetch(api, { method: 'PUT', headers: Object.assign({ 'Content-Type': 'application/json' }, headers), body: JSON.stringify({ message: 'Add ' + (names.join(', ') || 'bill data'), content: b64(serialize(merged)), sha: file.sha }) });
+    if (put.status === 403 || put.status === 404) throw new Error('The token can read the repository but not write to it. Set Contents to read and write.');
+    if (!put.ok) throw new Error('GitHub could not save the file (' + put.status + '). Nothing was changed.');
+    ['elec', 'gas'].forEach(t => local[t].forEach(row => { row.sent = true; }));
+    writeLocal();
+  }
+
+  /* ---------- notices under the toolbar ---------- */
+  let noticeMsg = null, tokenOpen = false;
+  function renderNotices() {
+    const box = $('local'), bills = pendingBills(), fresh = bills.filter(([, r]) => !r.sent), r = repo();
+    box.textContent = ''; box.hidden = !bills.length && !noticeMsg;
+    if (bills.length) {
+      const list = (fresh.length ? fresh : bills).map(([t, row]) => billName(t, row.month)).join(', ');
+      if (!fresh.length) {
+        box.className = 'notice quiet';
+        box.append(h('p', null, h('strong', null, 'Published. '), `GitHub is rebuilding the site with ${list}. Everyone else sees it in a minute or two.`));
+      } else {
+        box.className = 'notice';
+        box.append(h('p', null, h('strong', null, `${fresh.length === 1 ? 'One new bill is' : fresh.length + ' new bills are'} saved on this device only. `), `${list.charAt(0).toUpperCase() + list.slice(1)}. ` + (r ? 'Publish to make it show for everyone who opens the site.' : 'This copy of the page cannot publish, so other devices will not see it.')));
+        const acts = h('div', { class: 'acts' });
+        if (r) acts.append(h('button', { class: 'btn primary', type: 'button', id: 'pub-go', onclick: () => { getToken() ? doPublish(getToken()) : (tokenOpen = true, renderNotices()); } }, 'Publish to the site'));
+        acts.append(h('button', { class: 'btn', type: 'button', id: 'pub-copy', onclick: copyData }, r ? 'Copy the data instead' : 'Copy the data'));
+        acts.append(h('button', { class: 'btn ghost', type: 'button', id: 'pub-drop', onclick: () => { local = emptyLocal(); writeLocal(); noticeMsg = null; tokenOpen = false; data = merge(published, local); render(); } }, 'Remove'));
+        box.append(acts);
+        if (tokenOpen && r) {
+          const input = h('input', { type: 'password', id: 'gh-token', placeholder: 'Paste the token here', autocomplete: 'off' });
+          input.setAttribute('aria-label', 'GitHub token');
+          box.append(h('p', null, 'Publishing needs a GitHub token once per device. Create a fine-grained token at ',
+            h('a', { href: 'https://github.com/settings/personal-access-tokens/new', target: '_blank', rel: 'noopener' }, 'github.com/settings/personal-access-tokens'),
+            `, limit it to the ${r.owner}/${r.name} repository, and set Contents to read and write. It is stored only in this browser.`));
+          box.append(h('div', { class: 'acts' }, input, h('button', { class: 'btn primary', type: 'button', id: 'gh-save', onclick: () => { const v = input.value.trim(); if (v) doPublish(v); } }, 'Save and publish')));
+        }
+      }
+    }
+    if (noticeMsg) box.append(noticeMsg);
+
+    const wbox = $('waiting'), wt = D.waiting, parts = [];
+    if (wt.elecOnly.length) parts.push(`${wt.elecOnly.map(util.longY).join(', ')} has an electricity bill but no gas bill yet.`);
+    if (wt.gasOnly.length) parts.push(`${wt.gasOnly.map(util.longY).join(', ')} has a gas bill but no electricity bill yet.`);
+    wbox.hidden = !parts.length; wbox.textContent = '';
+    if (parts.length) wbox.append(h('p', null, parts.join(' ') + ' A month joins the charts once both bills are in.'));
+  }
+  async function doPublish(token) {
+    noticeMsg = h('p', null, 'Publishing…'); renderNotices();
+    try {
+      await publish(token);
+      try { localStorage.setItem(LS_TOKEN, token); } catch (e) { /* storage unavailable */ }
+      noticeMsg = null; tokenOpen = false;
+    } catch (err) {
+      noticeMsg = h('p', null, h('strong', null, 'Not published. '), String(err.message || err));
+      if (/token/i.test(String(err.message))) { try { localStorage.removeItem(LS_TOKEN); } catch (e) { /* storage unavailable */ } tokenOpen = true; }
+    }
+    renderNotices();
+  }
+  async function copyData() {
+    const text = serialize(data), r = repo();
+    const where = r ? h('span', null, ' Open ', h('a', { href: `https://github.com/${r.owner}/${r.name}/edit/main/data/bills.json`, target: '_blank', rel: 'noopener' }, 'the data file on GitHub'), ', select everything in it, paste, and press Commit changes.') : ' Paste it over data/bills.json in the repository.';
+    try {
+      await navigator.clipboard.writeText(text);
+      noticeMsg = h('p', null, h('strong', null, 'Copied. '), where);
+    } catch (e) {
+      const ta = h('textarea', { rows: 6, readOnly: true, value: text }); ta.setAttribute('aria-label', 'Data to copy');
+      noticeMsg = h('div', null, h('p', null, 'Copy everything in this box.', where), ta);
+      setTimeout(() => { ta.focus(); ta.select(); }, 0);
+    }
+    renderNotices();
+  }
+
+  /* ---------- add-a-bill dialog ---------- */
+  const FIELDS = {
+    elec: { main: [['dayKwh', 'Day use, kWh'], ['nightKwh', 'Night use, kWh'], ['total', 'Bill total, € incl. VAT']],
+      parts: [['energyDay', 'Electricity, day €'], ['energyNight', 'Electricity, night €'], ['supplierFee', 'Supplier monthly fee €'], ['balancing', 'Balancing cost €'], ['netDay', 'Network, day €'], ['netNight', 'Network, night €'], ['netFee', 'Network monthly fee €'], ['renewable', 'Renewable fee €'], ['security', 'Security-of-supply fee €'], ['excise', 'Excise €']] },
+    gas: { main: [['m3', 'Gas used, m³'], ['kwh', 'Energy, kWh'], ['total', 'Bill total, € incl. VAT']],
+      parts: [['gas', 'Gas €'], ['network', 'Network €'], ['excise', 'Excise €'], ['reserve', 'Reserve fee €']] }
+  };
+  let draft = null;
+  function openDialog(type) {
+    draft = { type, row: null, announced: [] };
+    $('dlg-title').textContent = type === 'elec' ? 'Add an electricity bill' : 'Add a gas bill';
+    $('dlg-text').value = ''; $('dlg-result').hidden = true; $('dlg-add').disabled = true; $('dlg-add').textContent = 'Add to dashboard';
+    const d = $('dlg'); if (d.showModal) d.showModal(); else d.setAttribute('open', '');
+    $('dlg-text').focus();
+  }
+  function closeDialog() { const d = $('dlg'); if (d.close) d.close(); else d.removeAttribute('open'); $('dlg-text').value = ''; draft = null; }
+  function readPaste() {
+    const text = $('dlg-text').value;
+    if (!text.trim()) { $('dlg-result').hidden = true; $('dlg-add').disabled = true; return; }
+    const res = parse(text, draft.type), msgs = [];
+    if (!res.type) { showResult(null, ['This does not read as an electricity or gas bill. Make sure the whole page was copied.']); return; }
+    if (res.type !== draft.type) msgs.push(`This is ${res.type === 'elec' ? 'an electricity' : 'a gas'} bill, so it will be added as ${res.type === 'elec' ? 'electricity' : 'gas'}.`);
+    draft.type = res.type; draft.row = res.row; draft.announced = res.announced;
+    if (res.missing.length) msgs.push('Some numbers could not be found. Fill in the highlighted boxes from the bill.');
+    showResult(res, msgs);
+  }
+  function showResult(res, msgs) {
+    $('dlg-result').hidden = false;
+    const fields = $('dlg-fields'), parts = $('dlg-parts'), box = $('dlg-msgs');
+    fields.textContent = ''; parts.textContent = ''; box.textContent = '';
+    if (!res) { $('dlg-what').textContent = 'Nothing found'; setChip('dlg-check', 'warn', 'Not a bill'); msgs.forEach(m => box.append(h('span', null, m))); $('dlg-more').hidden = true; $('dlg-add').disabled = true; return; }
+    $('dlg-more').hidden = false;
+    const def = FIELDS[draft.type], row = draft.row;
+    const input = (key, label, type) => {
+      const i = h('input', { type: type || 'text', id: 'd-' + key, value: row[key] == null ? '' : (type === 'month' ? row[key] : String(row[key])), inputMode: type === 'month' ? '' : 'decimal' });
+      i.addEventListener('input', () => { row[key] = type === 'month' ? i.value : parseFloat(i.value.replace(',', '.')); validate(); });
+      return h('label', null, label, i);
+    };
+    fields.append(input('month', 'Month', 'month'));
+    def.main.forEach(([k, l]) => fields.append(input(k, l)));
+    def.parts.forEach(([k, l]) => parts.append(input(k, l)));
+    const vat = h('input', { type: 'text', id: 'd-vat', value: String(Math.round((row.vat || 0.24) * 100)), inputMode: 'decimal' });
+    vat.addEventListener('input', () => { row.vat = parseFloat(vat.value.replace(',', '.')) / 100; validate(); });
+    parts.append(h('label', null, 'VAT %', vat));
+    draft.msgs = msgs;
+    validate();
+  }
+  function validate() {
+    const row = draft.row, def = FIELDS[draft.type], box = $('dlg-msgs');
+    const need = [...def.main, ...def.parts].map(x => x[0]);
+    let ok = /^\d{4}-\d{2}$/.test(row.month || '');
+    $('d-month').classList.toggle('bad', !ok);
+    need.forEach(k => { const bad = row[k] == null || isNaN(row[k]); $('d-' + k).classList.toggle('bad', bad); if (bad) ok = false; });
+    const c = check(draft.type, row);
+    $('dlg-what').textContent = ok || /^\d{4}-\d{2}$/.test(row.month || '') ? `${draft.type === 'elec' ? 'Electricity' : 'Gas'} · ${row.month ? util.longY(row.month) : ''}` : (draft.type === 'elec' ? 'Electricity' : 'Gas');
+    if (!ok) setChip('dlg-check', 'warn', 'Numbers missing');
+    else if (c.ok) setChip('dlg-check', 'good', 'Adds up to the bill total');
+    else setChip('dlg-check', 'warn', `Parts add up to ${eur(c.sum, 2)}, not ${eur(row.total, 2)}`);
+    box.textContent = '';
+    const msgs = (draft.msgs || []).slice();
+    if (ok && data[draft.type].some(r => r.month === row.month)) msgs.push(`${util.longY(row.month)} is already in the dashboard. Adding it again replaces those numbers.`);
+    if (row.partial) msgs.push('This bill covers only part of a month, so it stays out of the comparisons.');
+    draft.announced.filter(a => (a.month || a.from) > (row.month || '')).forEach(a => msgs.push(a.month ? `Also noted: ${num(a.price, 3).replace(/0$/, '')} €/m³ announced for ${util.longY(a.month)}.` : `Also noted: new price from ${util.longY(a.from)}, ${num(a.day * 100, 1)} s/kWh by day and ${num(a.night * 100, 1)} at night.`));
+    msgs.forEach(m => box.append(h('span', null, m)));
+    if (ok && !c.ok) $('dlg-more').open = true;
+    $('dlg-add').disabled = !ok;
+    $('dlg-add').textContent = ok && !c.ok ? 'Add anyway' : 'Add to dashboard';
+  }
+  function addDraft() {
+    if (!draft || !draft.row) return;
+    const row = {}; Object.keys(draft.row).forEach(k => { const v = draft.row[k]; if (v != null && !(typeof v === 'number' && isNaN(v))) row[k] = v; });
+    local[draft.type] = local[draft.type].filter(r => r.month !== row.month).concat([row]);
+    const key = draft.type === 'elec' ? 'from' : 'month';
+    draft.announced.forEach(a => { local.announced[draft.type] = local.announced[draft.type].filter(x => x[key] !== a[key]).concat([a]); });
+    prune();
+    noticeMsg = null;
+    data = merge(published, local);
+    closeDialog();
+    render();
+    $('local').scrollIntoView({ block: 'nearest' });
+  }
+
+  /* ---------- start ---------- */
+  async function start() {
+    published = window.MT14_DATA || await fetch('data/bills.json', { cache: 'no-store' }).then(r => r.json());
+    local = readLocal(); prune();
+    data = merge(published, local);
+    $('u-eur').addEventListener('click', () => setUnit('eur'));
+    $('u-kwh').addEventListener('click', () => setUnit('kwh'));
+    ['input', 'change'].forEach(ev => { $('f-gas').addEventListener(ev, forecast); $('f-eff').addEventListener(ev, forecast); });
+    $('add-elec').addEventListener('click', () => openDialog('elec'));
+    $('add-gas').addEventListener('click', () => openDialog('gas'));
+    $('dlg-x').addEventListener('click', closeDialog); $('dlg-cancel').addEventListener('click', closeDialog);
+    $('dlg-text').addEventListener('input', readPaste);
+    $('dlg-add').addEventListener('click', addDraft);
+    render();
+    let rt; new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(() => { drawCmp(); drawMonth(); }, 80); }).observe($('c-cmp'));
+  }
+  start().catch(err => { const p = document.createElement('p'); p.className = 'note'; p.style.padding = '24px'; p.textContent = 'The bill data could not be loaded. ' + (err && err.message ? err.message : ''); document.body.prepend(p); });
+})();
+</script>
+
+</body></html>

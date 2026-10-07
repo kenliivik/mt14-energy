@@ -1,0 +1,48 @@
+{
+  "meta": {"home":"MT14","switchMonth":"2026-04","heating":"air-to-water heat pump","repo":"kenliivik/mt14-energy"},
+  "announced": {
+    "elec": [{"from":"2026-04","to":"2026-09","day":0.119,"night":0.099},{"from":"2026-10","to":"2027-03","day":0.149,"night":0.12}],
+    "gas": [{"month":"2026-10","price":1.095},{"month":"2026-11","price":1.12}]
+  },
+  "elec": [
+    {"month":"2025-03","dayKwh":129.397,"nightKwh":155.237,"total":58.6,"vat":0.22,"energyDay":12.303,"energyNight":12.216,"supplierFee":1.21,"balancing":0.0,"netDay":4.77,"netNight":3.26,"netFee":11.47,"renewable":2.39,"security":0.0,"excise":0.41,"partial":true},
+    {"month":"2025-04","dayKwh":162.597,"nightKwh":210.669,"total":77.14,"vat":0.22,"energyDay":15.46,"energyNight":16.578,"supplierFee":1.631,"balancing":0.0,"netDay":6.0,"netNight":4.42,"netFee":15.46,"renewable":3.14,"security":0.0,"excise":0.54},
+    {"month":"2025-05","dayKwh":140.11,"nightKwh":212.469,"total":73.76,"vat":0.22,"energyDay":13.322,"energyNight":16.719,"supplierFee":1.631,"balancing":0.0,"netDay":5.17,"netNight":4.46,"netFee":15.46,"renewable":2.96,"security":0.0,"excise":0.74},
+    {"month":"2025-06","dayKwh":112.579,"nightKwh":176.894,"total":64.19,"vat":0.22,"energyDay":10.704,"energyNight":13.92,"supplierFee":1.631,"balancing":0.0,"netDay":4.15,"netNight":3.71,"netFee":15.46,"renewable":2.43,"security":0.0,"excise":0.61},
+    {"month":"2025-07","dayKwh":119.981,"nightKwh":122.059,"total":59.07,"vat":0.24,"energyDay":11.408,"energyNight":9.605,"supplierFee":1.631,"balancing":0.0,"netDay":4.43,"netNight":2.56,"netFee":15.46,"renewable":2.03,"security":0.0,"excise":0.51},
+    {"month":"2025-08","dayKwh":113.208,"nightKwh":162.597,"total":63.98,"vat":0.24,"energyDay":10.764,"energyNight":12.795,"supplierFee":1.631,"balancing":0.0,"netDay":4.18,"netNight":3.41,"netFee":15.92,"renewable":2.32,"security":0.0,"excise":0.58},
+    {"month":"2025-09","dayKwh":137.42,"nightKwh":148.211,"total":66.29,"vat":0.24,"energyDay":13.066,"energyNight":11.663,"supplierFee":1.631,"balancing":0.0,"netDay":5.07,"netNight":3.11,"netFee":15.92,"renewable":2.4,"security":0.0,"excise":0.6},
+    {"month":"2025-10","dayKwh":178.249,"nightKwh":205.992,"total":81.42,"vat":0.24,"energyDay":16.948,"energyNight":16.21,"supplierFee":1.631,"balancing":0.0,"netDay":6.58,"netNight":4.33,"netFee":15.92,"renewable":3.23,"security":0.0,"excise":0.81},
+    {"month":"2025-11","dayKwh":191.37,"nightKwh":211.898,"total":84.53,"vat":0.24,"energyDay":18.195,"energyNight":16.674,"supplierFee":1.631,"balancing":0.0,"netDay":7.06,"netNight":4.45,"netFee":15.92,"renewable":3.39,"security":0.0,"excise":0.85},
+    {"month":"2025-12","dayKwh":192.339,"nightKwh":247.029,"total":89.5,"vat":0.24,"energyDay":18.288,"energyNight":19.439,"supplierFee":1.631,"balancing":0.0,"netDay":7.1,"netNight":5.19,"netFee":15.92,"renewable":3.69,"security":0.0,"excise":0.92},
+    {"month":"2026-01","dayKwh":212.013,"nightKwh":306.99,"total":108.45,"vat":0.24,"energyDay":20.16,"energyNight":24.16,"supplierFee":1.63,"balancing":1.94,"netDay":7.82,"netNight":6.45,"netFee":15.92,"renewable":4.36,"security":3.93,"excise":1.09},
+    {"month":"2026-02","dayKwh":249.593,"nightKwh":304.762,"total":115.27,"vat":0.24,"energyDay":23.73,"energyNight":23.98,"supplierFee":1.63,"balancing":2.07,"netDay":9.21,"netNight":6.4,"netFee":15.92,"renewable":4.66,"security":4.2,"excise":1.16},
+    {"month":"2026-03","dayKwh":193.729,"nightKwh":239.475,"total":94.79,"vat":0.24,"energyDay":18.42,"energyNight":18.84,"supplierFee":1.63,"balancing":1.62,"netDay":7.15,"netNight":5.03,"netFee":15.92,"renewable":3.64,"security":3.28,"excise":0.91},
+    {"month":"2026-04","dayKwh":266.484,"nightKwh":367.399,"total":128.72,"vat":0.24,"energyDay":25.57,"energyNight":29.33,"supplierFee":1.63,"balancing":2.36,"netDay":9.83,"netNight":7.72,"netFee":15.92,"renewable":5.32,"security":4.8,"excise":1.33},
+    {"month":"2026-05","dayKwh":210.252,"nightKwh":310.961,"total":109.38,"vat":0.24,"energyDay":20.18,"energyNight":24.83,"supplierFee":1.63,"balancing":1.94,"netDay":7.76,"netNight":6.53,"netFee":15.92,"renewable":4.38,"security":3.95,"excise":1.09},
+    {"month":"2026-06","dayKwh":183.593,"nightKwh":218.809,"total":91.47,"vat":0.24,"energyDay":17.62,"energyNight":17.47,"supplierFee":1.63,"balancing":1.5,"netDay":6.77,"netNight":4.59,"netFee":16.91,"renewable":3.38,"security":3.05,"excise":0.85},
+    {"month":"2026-07","dayKwh":173.713,"nightKwh":177.539,"total":83.3,"vat":0.24,"energyDay":16.67,"energyNight":14.17,"supplierFee":1.63,"balancing":1.31,"netDay":6.41,"netNight":3.73,"netFee":16.91,"renewable":2.95,"security":2.66,"excise":0.74},
+    {"month":"2026-08","dayKwh":169.73,"nightKwh":191.946,"total":84.73,"vat":0.24,"energyDay":16.29,"energyNight":15.32,"supplierFee":1.63,"balancing":1.35,"netDay":6.26,"netNight":4.03,"netFee":16.91,"renewable":3.04,"security":2.74,"excise":0.76},
+    {"month":"2026-09","dayKwh":199.901,"nightKwh":197.916,"total":91.44,"vat":0.24,"energyDay":19.18,"energyNight":15.8,"supplierFee":1.63,"balancing":1.48,"netDay":7.38,"netNight":4.16,"netFee":16.91,"renewable":3.34,"security":3.02,"excise":0.84}
+  ],
+  "gas": [
+    {"month":"2025-04","m3":83.781,"kwh":905.67,"total":87.0,"vat":0.22,"gas":51.09,"network":15.55,"excise":4.01,"reserve":0.66,"priceGas":0.6098,"priceNetwork":0.18556,"priceExcise":0.04781,"priceReserve":0.00789},
+    {"month":"2025-05","m3":61.462,"kwh":672.39,"total":58.69,"vat":0.22,"gas":32.75,"network":11.4,"excise":3.47,"reserve":0.49,"priceGas":0.53279,"priceNetwork":0.18556,"priceExcise":0.05642,"priceReserve":0.00799},
+    {"month":"2025-06","m3":37.201,"kwh":395.82,"total":32.54,"vat":0.22,"gas":17.38,"network":6.9,"excise":2.1,"reserve":0.29,"priceGas":0.46721,"priceNetwork":0.18556,"priceExcise":0.05642,"priceReserve":0.00777},
+    {"month":"2025-07","m3":26.028,"kwh":280.84,"total":24.39,"vat":0.24,"gas":12.7,"network":5.29,"excise":1.47,"reserve":0.21,"priceGas":0.4879,"priceNetwork":0.20342,"priceExcise":0.05642,"priceReserve":0.00788},
+    {"month":"2025-08","m3":39.608,"kwh":423.01,"total":37.1,"vat":0.24,"gas":19.32,"network":8.06,"excise":2.23,"reserve":0.31,"priceGas":0.4879,"priceNetwork":0.20342,"priceExcise":0.05642,"priceReserve":0.0078},
+    {"month":"2025-09","m3":47.367,"kwh":501.62,"total":44.38,"vat":0.24,"gas":23.11,"network":9.64,"excise":2.67,"reserve":0.37,"priceGas":0.4879,"priceNetwork":0.20342,"priceExcise":0.05642,"priceReserve":0.00773},
+    {"month":"2025-10","m3":96.061,"kwh":1013.44,"total":89.99,"vat":0.24,"gas":46.87,"network":19.54,"excise":5.42,"reserve":0.74,"priceGas":0.4879,"priceNetwork":0.20342,"priceExcise":0.05642,"priceReserve":0.0077},
+    {"month":"2025-11","m3":108.114,"kwh":1162.23,"total":101.3,"vat":0.24,"gas":52.75,"network":21.99,"excise":6.1,"reserve":0.85,"priceGas":0.4879,"priceNetwork":0.20342,"priceExcise":0.05642,"priceReserve":0.00785},
+    {"month":"2025-12","m3":123.037,"kwh":1315.27,"total":115.27,"vat":0.24,"gas":60.03,"network":25.03,"excise":6.94,"reserve":0.96,"priceGas":0.4879,"priceNetwork":0.20342,"priceExcise":0.05642,"priceReserve":0.0078},
+    {"month":"2026-01","m3":192.976,"kwh":2057.12,"total":180.79,"vat":0.24,"gas":94.15,"network":39.26,"excise":10.89,"reserve":1.5,"priceGas":0.4879,"priceNetwork":0.20342,"priceExcise":0.05642,"priceReserve":0.00778},
+    {"month":"2026-02","m3":162.224,"kwh":1734.17,"total":139.82,"vat":0.24,"gas":69.34,"network":33.0,"excise":9.15,"reserve":1.27,"priceGas":0.42742,"priceNetwork":0.20342,"priceExcise":0.05642,"priceReserve":0.0078},
+    {"month":"2026-03","m3":101.645,"kwh":1108.95,"total":100.83,"vat":0.24,"gas":54.1,"network":20.68,"excise":5.73,"reserve":0.81,"priceGas":0.53226,"priceNetwork":0.20342,"priceExcise":0.05642,"priceReserve":0.00796},
+    {"month":"2026-04","m3":25.152,"kwh":269.38,"total":24.96,"vat":0.24,"gas":13.39,"network":5.12,"excise":1.42,"reserve":0.2,"priceGas":0.53226,"priceNetwork":0.20342,"priceExcise":0.05642,"priceReserve":0.00782},
+    {"month":"2026-05","m3":2.572,"kwh":27.52,"total":2.94,"vat":0.24,"gas":1.68,"network":0.52,"excise":0.15,"reserve":0.02,"priceGas":0.65323,"priceNetwork":0.20342,"priceExcise":0.05642,"priceReserve":0.0078,"estimated":true},
+    {"month":"2026-06","m3":2.389,"kwh":25.66,"total":2.63,"vat":0.24,"gas":1.48,"network":0.49,"excise":0.13,"reserve":0.02,"priceGas":0.62097,"priceNetwork":0.20342,"priceExcise":0.05642,"priceReserve":0.00784},
+    {"month":"2026-07","m3":2.728,"kwh":28.94,"total":2.99,"vat":0.24,"gas":1.69,"network":0.55,"excise":0.15,"reserve":0.02,"priceGas":0.62097,"priceNetwork":0.20342,"priceExcise":0.05642,"priceReserve":0.00775},
+    {"month":"2026-08","m3":2.615,"kwh":27.98,"total":2.68,"vat":0.24,"gas":1.46,"network":0.53,"excise":0.15,"reserve":0.02,"priceGas":0.55645,"priceNetwork":0.20342,"priceExcise":0.05642,"priceReserve":0.00781},
+    {"month":"2026-09","m3":2.333,"kwh":25.22,"total":2.98,"vat":0.24,"gas":1.79,"network":0.47,"excise":0.13,"reserve":0.02,"priceGas":0.76613,"priceNetwork":0.20342,"priceExcise":0.05642,"priceReserve":0.00789}
+  ]
+}
