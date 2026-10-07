@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MT14 Heating Switch</title>
+<meta name="description" content="Gas vs heat pump: what the energy bills say.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f7f6f2;--card:#fff;--ink:#1d1d1b;--muted:#6b6a65;--line:#e4e2db;--elec:#2f6fd6;--gas:#e0792b;--good:#2c8a4b;}
+@media (prefers-color-scheme:dark){:root{--bg:#141413;--card:#1e1e1c;--ink:#efeee9;--muted:#a3a29c;--line:#33322f;--elec:#6c9cf0;--gas:#f0a060;--good:#5cc07d;}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:40px 16px 64px}
+h1{font-size:clamp(28px,5vw,40px);margin:0 0 6px;letter-spacing:-.02em}
+h2{font-size:20px;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 32px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:28px}
+.kpi,.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.kpi .v{font-size:30px;font-weight:700;letter-spacing:-.02em}
+.kpi .l{color:var(--muted);font-size:14px}
+.good{color:var(--good)}
+.card{margin-bottom:20px}
+.card p.note{color:var(--muted);font-size:14px;margin:0 0 14px}
+.chart{position:relative;height:320px}
+ul.find{padding-left:20px;margin:8px 0 0}ul.find li{margin:6px 0}
+table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-weight:500}
+.scroll{overflow-x:auto}
+footer{color:var(--muted);font-size:13px;margin-top:28px}
+</style>
+</head>
+<body>
+<main>
+  <h1>MT14 heating switch</h1>
+  <p class="sub">Gas vs air-to-water heat pump, from the electricity and gas bills since March 2025. <span id="updated"></span></p>
+
+  <section class="kpis">
+    <div class="kpi"><div class="v good">≈ 139 €</div><div class="l">saved in the first six months on the heat pump (Apr to Sep 2026, vs staying on gas)</div></div>
+    <div class="kpi"><div class="v" id="k12">–</div><div class="l" id="k12l">spent in the last 12 months</div></div>
+    <div class="kpi"><div class="v">3.3×</div><div class="l">kWh of gas replaced per extra kWh of electricity</div></div>
+    <div class="kpi"><div class="v">≈ 640 €</div><div class="l">heat pump estimate for Oct to Mar, vs about 1,100 € on gas</div></div>
+  </section>
+
+  <section class="card">
+    <h2>Monthly cost</h2>
+    <p class="note">Euros incl. VAT. Heating moved off gas at the start of April 2026.</p>
+    <div class="chart"><canvas id="cost"></canvas></div>
+  </section>
+
+  <section class="card">
+    <h2>Monthly energy</h2>
+    <p class="note">Electricity (day + night) and gas, both in kWh. Gas for May 2026 is estimated from meter readings.</p>
+    <div class="chart"><canvas id="energy"></canvas></div>
+  </section>
+
+  <section class="card">
+    <h2>Same months, a year apart</h2>
+    <p class="note">April to September, gas + electricity, euros incl. VAT.</p>
+    <div class="chart"><canvas id="yoy"></canvas></div>
+  </section>
+
+  <section class="card">
+    <h2>Findings</h2>
+    <ul class="find">
+      <li>Gas fell from 102 m³ in March 2026 to 25 m³ in April and about 2.5 m³ a month since.</li>
+      <li>April to September 2026 cost <b>628 €</b>, against 689 € for the same months of 2025. Pricing 2025 usage at 2026 rates gives 767 € for staying on gas, so the switch saved about <b>139 €</b> (Apr 14, May 39, Jun 18, Jul 7, Aug 23, Sep 38). Not weather-corrected.</li>
+      <li>Electricity rose by 849 kWh over those months while 2,775 kWh of gas disappeared: a ratio of 3.3.</li>
+      <li>The last gas-heated winter (Oct 2025 to Mar 2026) used 784 m³ (8,391 kWh) and cost 728 € in gas.</li>
+      <li>The heat pump came with the home at no cost, so there is no payback period: every saving is pure gain.</li>
+      <li>Next winter at October 2026 prices (gas about 1.43 €/m³ all-in, electricity about 19.5 c/kWh): gas would cost about 1,100 €, the heat pump about 640 € if 1 kWh of electricity replaces 2.5 kWh of gas. The pump wins whenever that ratio stays above about 1.5.</li>
+      <li>Still to measure: a full winter on the heat pump.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Bill data</h2>
+    <div class="scroll"><table id="tbl"><thead><tr><th>Month</th><th>Elec day kWh</th><th>Elec night kWh</th><th>Elec €</th><th>Gas m³</th><th>Gas kWh</th><th>Gas €</th><th>Total €</th></tr></thead><tbody></tbody></table></div>
+    <p class="note" style="margin-top:10px">Raw numbers: <a href="data.json">data.json</a>. Electricity bills start 9 March 2025; no gas bill for March 2025; May 2026 gas is estimated.</p>
+  </section>
+
+  <footer>Suppliers: Alexela (electricity), Elektrilevi (network), Energate (gas). VAT 22% until June 2025, 24% from July 2025.</footer>
+</main>
+<script>
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const eur = v => v.toLocaleString('en-US',{maximumFractionDigits:0}) + ' €';
+const label = m => new Date(m + '-01').toLocaleDateString('en-GB',{month:'short',year:'2-digit'});
+
+fetch('data.json').then(r => r.json()).then(d => {
+  const M = d.months, L = M.map(x => label(x.month));
+  const elec = css('--elec'), gas = css('--gas'), ink = css('--muted'), line = css('--line');
+  Chart.defaults.color = ink; Chart.defaults.borderColor = line; Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+  document.getElementById('updated').textContent = 'Updated ' + d.updated + '.';
+
+  const last12 = M.slice(-12);
+  const tot = last12.reduce((s,x) => s + x.elec_eur + (x.gas_eur||0), 0);
+  document.getElementById('k12').textContent = eur(tot);
+  document.getElementById('k12l').textContent = 'spent in the 12 months to ' + label(last12.at(-1).month) + ' (gas + electricity)';
+
+  const stacked = {responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true}},plugins:{legend:{position:'bottom'}}};
+
+  new Chart(cost, {type:'bar', data:{labels:L, datasets:[
+    {label:'Electricity €', data:M.map(x=>x.elec_eur), backgroundColor:elec, borderRadius:3},
+    {label:'Gas €', data:M.map(x=>x.gas_eur), backgroundColor:gas, borderRadius:3}]}, options:stacked});
+
+  new Chart(energy, {type:'bar', data:{labels:L, datasets:[
+    {label:'Electricity kWh', data:M.map(x=>+(x.elec_day_kwh+x.elec_night_kwh).toFixed(1)), backgroundColor:elec, borderRadius:3},
+    {label:'Gas kWh', data:M.map(x=>x.gas_kwh), backgroundColor:gas, borderRadius:3}]}, options:stacked});
+
+  const mo = ['04','05','06','07','08','09'], get = (y,m) => M.find(x => x.month === y+'-'+m);
+  new Chart(yoy, {type:'bar', data:{labels:mo.map(m=>new Date('2026-'+m+'-01').toLocaleDateString('en-GB',{month:'short'})), datasets:[
+    {label:'2025 (gas heating)', data:mo.map(m=>{const r=get('2025',m);return r?+(r.elec_eur+r.gas_eur).toFixed(2):null}), backgroundColor:gas, borderRadius:3},
+    {label:'2026 (heat pump)', data:mo.map(m=>{const r=get('2026',m);return r?+(r.elec_eur+r.gas_eur).toFixed(2):null}), backgroundColor:elec, borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},scales:{x:{grid:{display:false}}},plugins:{legend:{position:'bottom'}}}});
+
+  const f = (v,dp=1) => v == null ? '–' : v.toFixed(dp);
+  document.querySelector('#tbl tbody').innerHTML = M.map(x => `<tr title="${x.note||''}"><td>${x.month}${x.note?' *':''}</td><td>${f(x.elec_day_kwh)}</td><td>${f(x.elec_night_kwh)}</td><td>${f(x.elec_eur,2)}</td><td>${f(x.gas_m3,3)}</td><td>${f(x.gas_kwh,1)}</td><td>${f(x.gas_eur,2)}</td><td>${(x.elec_eur+(x.gas_eur||0)).toFixed(2)}</td></tr>`).join('');
+});
+</script>
+</body>
+</html>
